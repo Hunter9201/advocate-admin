@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Admin Panel - Uganda Legal Documents</title>
+    <title>Auto-Deploy Admin - Uganda Legal Documents</title>
     <style>
         :root {
             --primary-color: #1a365d;
@@ -15,6 +15,7 @@
             --dark-color: #2d3748;
             --border-color: #e2e8f0;
             --card-bg: #ffffff;
+            --github-color: #24292e;
         }
         
         * {
@@ -65,102 +66,6 @@
             font-size: 14px;
         }
         
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: white;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
-        }
-        
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-            width: 100%;
-        }
-        
-        .btn-primary:hover {
-            background: #2c5282;
-            transform: translateY(-1px);
-        }
-        
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-        
-        .btn-warning {
-            background: var(--warning-color);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: var(--danger-color);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #e2e8f0;
-            color: var(--dark-color);
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
         /* Admin Dashboard */
         .admin-container {
             max-width: 1400px;
@@ -168,6 +73,7 @@
             padding: 20px;
         }
         
+        /* Header */
         .admin-header {
             background: var(--card-bg);
             border-radius: 12px;
@@ -175,12 +81,16 @@
             margin-bottom: 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
+        }
+        
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
         }
         
-        .admin-header h1 {
+        .header-top h1 {
             color: var(--primary-color);
             font-size: 24px;
             display: flex;
@@ -188,22 +98,50 @@
             gap: 12px;
         }
         
-        .user-info {
+        .site-link {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 15px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            border: 2px solid #cbd5e0;
         }
         
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+        .site-link:hover {
+            background: #e6f7ff;
+            border-color: var(--primary-color);
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
         }
         
         /* Upload Section */
@@ -227,6 +165,7 @@
             gap: 10px;
         }
         
+        /* Drop Zone */
         .drop-zone {
             border: 3px dashed var(--border-color);
             border-radius: 12px;
@@ -238,15 +177,9 @@
             margin-bottom: 25px;
         }
         
-        .drop-zone:hover {
+        .drop-zone:hover, .drop-zone.drag-over {
             border-color: var(--primary-color);
             background: #f0f7ff;
-        }
-        
-        .drop-zone.drag-over {
-            border-color: var(--primary-color);
-            background: #ebf5ff;
-            transform: scale(1.01);
         }
         
         .drop-zone-icon {
@@ -255,17 +188,8 @@
             margin-bottom: 20px;
         }
         
-        .drop-zone-text h3 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .drop-zone-text p {
-            color: #718096;
-            margin-bottom: 15px;
-        }
-        
-        .file-list {
+        /* File Cards */
+        .file-grid {
             display: grid;
             gap: 15px;
             margin-bottom: 25px;
@@ -274,11 +198,8 @@
         .file-card {
             background: white;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
             transition: all 0.3s;
         }
         
@@ -287,171 +208,105 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        .file-icon {
-            font-size: 32px;
-            color: var(--danger-color);
-            flex-shrink: 0;
-        }
-        
-        .file-info {
-            flex: 1;
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
         
         .file-name {
             font-weight: 600;
             color: var(--primary-color);
-            margin-bottom: 5px;
             font-size: 16px;
         }
         
-        .file-meta {
-            font-size: 14px;
-            color: #718096;
-            margin-bottom: 10px;
-        }
-        
-        .file-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .auto-extract-info {
-            background: #e6fffa;
-            border: 1px solid #b2f5ea;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .extract-title {
-            color: #234e52;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .category-selector {
+        .file-info {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .category-btn {
-            padding: 8px 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .category-btn:hover {
-            border-color: var(--primary-color);
-        }
-        
-        .category-btn.selected {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        /* Documents Grid */
-        .documents-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .document-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
-        }
-        
-        .document-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border-color: var(--primary-color);
-        }
-        
-        .document-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-        
-        .document-id {
-            background: var(--primary-color);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .document-title {
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 16px;
-            line-height: 1.4;
-        }
-        
-        .document-category {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #e6f7ff;
-            color: var(--primary-color);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        
-        .document-meta {
-            font-size: 13px;
-            color: #718096;
-            display: flex;
-            flex-wrap: wrap;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 15px;
+            margin-bottom: 15px;
         }
         
-        .document-meta span {
+        .info-group {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 5px;
         }
         
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--primary-color);
+        .info-label {
+            color: #718096;
+            font-size: 12px;
+            font-weight: 600;
         }
         
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
+        .info-value {
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        /* GitHub Actions */
+        .github-actions {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .github-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .github-header h3 {
+            color: var(--github-color);
+            margin: 0;
+        }
+        
+        .github-steps {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #d0d7de;
+        }
+        
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            color: var(--github-color);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .step-description {
+            color: #57606a;
+            font-size: 14px;
         }
         
         /* Action Buttons */
@@ -460,6 +315,116 @@
             gap: 15px;
             justify-content: center;
             margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2c5282;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-github {
+            background: var(--github-color);
+            color: white;
+        }
+        
+        .btn-github:hover {
+            background: #000;
+        }
+        
+        /* Preview Section */
+        .preview-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .preview-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .preview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .preview-id {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .preview-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .preview-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #718096;
         }
         
         /* Modal */
@@ -481,7 +446,7 @@
             background: white;
             border-radius: 12px;
             padding: 30px;
-            max-width: 500px;
+            max-width: 800px;
             width: 100%;
             max-height: 80vh;
             overflow-y: auto;
@@ -508,15 +473,30 @@
             cursor: pointer;
             color: #718096;
             padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
-        .close-modal:hover {
-            color: var(--danger-color);
+        /* Code Block */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .code-title {
+            color: #569cd6;
+            font-weight: 600;
         }
         
         /* Responsive */
@@ -533,14 +513,6 @@
                 padding: 40px 20px;
             }
             
-            .documents-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .file-card {
-                flex-direction: column;
-            }
-            
             .action-buttons {
                 flex-direction: column;
             }
@@ -548,6 +520,12 @@
             .btn {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -557,24 +535,24 @@
     <div id="loginPage" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <h1>🔐 Smart Admin Panel</h1>
+                <h1>🚀 Auto-Deploy Admin</h1>
                 <p>Uganda Legal Documents Library</p>
-                <p style="font-size: 12px; color: var(--warning-color); margin-top: 10px;">
-                    Automatic PDF Metadata Extraction • Bulk Upload • Zero Manual Entry
+                <p style="font-size: 12px; color: var(--success-color); margin-top: 10px;">
+                    One-Click GitHub Pages Deployment • No Manual Updates
                 </p>
             </div>
-            <div id="loginMessage" class="message"></div>
+            <div id="loginMessage" class="message" style="display: none;"></div>
             <form id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" placeholder="admin" required>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="admin" required style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 16px;">
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 16px;">
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    <span>🔑</span> Login
+                <button type="submit" class="btn" style="background: var(--primary-color); color: white; width: 100%; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                    🔑 Login to Admin Panel
                 </button>
             </form>
         </div>
@@ -584,13 +562,54 @@
     <div id="adminDashboard" class="admin-container" style="display: none;">
         <!-- Header -->
         <header class="admin-header">
-            <h1>
-                <span>⚖️</span>
-                Smart Admin Panel - Uganda Legal Documents
-            </h1>
-            <div class="user-info">
-                <div class="user-avatar">A</div>
-                <button id="logoutBtn" class="btn btn-danger">Logout</button>
+            <div class="header-top">
+                <h1>
+                    <span>⚖️</span>
+                    Auto-Deploy Admin Panel
+                    <span style="font-size: 14px; color: var(--success-color); background: #d4edda; padding: 4px 12px; border-radius: 20px; margin-left: 10px;">
+                        Connected to GitHub Pages
+                    </span>
+                </h1>
+                <a href="https://hunter9201.github.io/advocate/" target="_blank" class="site-link">
+                    <span>🌐</span>
+                    View Live Site
+                </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDocs">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="readyDocs">0</div>
+                    <div class="stat-label">Ready to Deploy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lastUpdate">Never</div>
+                    <div class="stat-label">Last Deployment</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="nextId">1</div>
+                    <div class="stat-label">Next Document ID</div>
+                </div>
+            </div>
+            
+            <!-- GitHub Status -->
+            <div style="background: #f0f7ff; border: 2px solid var(--primary-color); border-radius: 8px; padding: 15px; margin-top: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span style="color: var(--primary-color); font-weight: 600;">📁 GitHub Repository:</span>
+                    <a href="https://github.com/hunter9201/advocate" target="_blank" style="color: #0366d6; text-decoration: none;">
+                        hunter9201/advocate
+                    </a>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--primary-color); font-weight: 600;">🌐 Live Site:</span>
+                    <a href="https://hunter9201.github.io/advocate/" target="_blank" style="color: #0366d6; text-decoration: none;">
+                        https://hunter9201.github.io/advocate/
+                    </a>
+                </div>
             </div>
         </header>
 
@@ -598,148 +617,198 @@
         <section class="upload-section">
             <h2 class="section-title">
                 <span>📤</span>
-                Upload Documents (Automatic Processing)
+                Step 1: Upload PDF Documents (Up to 5)
             </h2>
             
-            <!-- Progress Indicator -->
-            <div id="progressContainer" style="display: none;">
-                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px;">
-                    <div id="progressBar" style="background: var(--primary-color); height: 100%; width: 0%; transition: width 0.3s;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
-                    <span id="progressText">Processing...</span>
-                    <span id="progressPercent">0%</span>
-                </div>
-            </div>
-
             <!-- Drop Zone -->
             <div id="dropZone" class="drop-zone">
                 <div class="drop-zone-icon">📄</div>
-                <div class="drop-zone-text">
-                    <h3>Drop PDF Files Here</h3>
-                    <p>Upload up to 5 PDF files at once (Maximum 50MB each)</p>
-                    <p style="font-size: 14px; color: var(--success-color);">
-                        <strong>No manual entry needed!</strong> All details will be extracted automatically from filenames
+                <div style="text-align: center;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 10px;">Drop PDF Files Here</h3>
+                    <p style="color: #718096; margin-bottom: 15px;">Upload up to 5 PDF files at once</p>
+                    <p style="color: var(--success-color); font-size: 14px; margin-bottom: 20px;">
+                        ✅ <strong>No manual entry needed!</strong> Everything is auto-extracted
                     </p>
-                    <button type="button" id="browseBtn" class="btn btn-secondary" style="margin-top: 15px;">
+                    <button type="button" id="browseBtn" class="btn" style="background: #e2e8f0; color: var(--dark-color);">
                         <span>📁</span> Browse Files
                     </button>
                 </div>
                 <input type="file" id="fileInput" multiple accept=".pdf" style="display: none;">
             </div>
 
-            <!-- Auto-Extraction Info -->
-            <div class="auto-extract-info">
-                <div class="extract-title">
-                    <span>🤖</span>
-                    Smart Extraction Rules
-                </div>
-                <div style="color: #234e52; font-size: 14px;">
-                    <p><strong>Filename patterns that will be automatically detected:</strong></p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>"Act" or "Cap" → Constitutional/Administrative category</li>
-                        <li>"Rules" or "Regulations" → Procedure category</li>
-                        <li>"Criminal" or "Penal" → Criminal category</li>
-                        <li>"Company" or "Business" → Commercial category</li>
-                        <li>Years in filename (e.g., 2021, 1995) → Extracted as year</li>
-                        <li>File size → Automatically calculated</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Category Selection -->
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Quick Category Selection (Optional)</label>
-                <div class="category-selector">
-                    <button type="button" class="category-btn" data-category="constitutional">Constitutional Law</button>
-                    <button type="button" class="category-btn" data-category="criminal">Criminal Law</button>
-                    <button type="button" class="category-btn" data-category="civil">Civil Law</button>
-                    <button type="button" class="category-btn" data-category="commercial">Commercial Law</button>
-                    <button type="button" class="category-btn" data-category="family">Family Law</button>
-                    <button type="button" class="category-btn" data-category="property">Property Law</button>
-                    <button type="button" class="category-btn" data-category="procedure">Procedure</button>
-                    <button type="button" class="category-btn" data-category="administrative">Administrative</button>
-                    <button type="button" class="category-btn" data-category="employment">Employment</button>
-                    <button type="button" class="category-btn" data-category="international">International</button>
-                </div>
-            </div>
-
             <!-- Selected Files -->
             <div id="selectedFilesContainer" style="display: none;">
-                <h3 style="color: var(--primary-color); margin-bottom: 15px;">Selected Files (5 maximum)</h3>
-                <div id="fileList" class="file-list"></div>
+                <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                    Selected Files (<span id="fileCount">0</span>/5)
+                </h3>
                 
-                <!-- Bulk Actions -->
-                <div style="background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div id="fileGrid" class="file-grid">
+                    <!-- Files will appear here -->
+                </div>
+                
+                <!-- Smart Processing -->
+                <div style="background: #e6fffa; border: 1px solid #81e6d9; border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <span style="font-size: 24px;">🤖</span>
                         <div>
-                            <strong style="color: var(--primary-color);">Bulk Actions</strong>
-                            <p style="color: #718096; font-size: 14px; margin-top: 5px;">
-                                Apply settings to all selected files
+                            <h4 style="color: #234e52; margin: 0;">Smart Processing Ready</h4>
+                            <p style="color: #4fd1c7; margin: 5px 0 0 0; font-size: 14px;">
+                                Click "Process & Analyze" to auto-extract all information
                             </p>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button type="button" id="applyCategoryBtn" class="btn btn-secondary" style="padding: 8px 16px;">
-                                Apply Category to All
-                            </button>
-                            <button type="button" id="clearSelectionBtn" class="btn btn-danger" style="padding: 8px 16px;">
-                                Clear All
-                            </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Upload Button -->
+                
+                <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button id="processFilesBtn" class="btn btn-success">
-                        <span>🚀</span> Process & Add Documents
+                    <button id="clearBtn" class="btn btn-danger">
+                        <span>🗑️</span> Clear All
+                    </button>
+                    <button id="processBtn" class="btn btn-success">
+                        <span>🔍</span> Process & Analyze Files
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- Existing Documents -->
+        <!-- GitHub Deployment Section -->
+        <section class="upload-section" id="deploySection" style="display: none;">
+            <h2 class="section-title">
+                <span>🚀</span>
+                Step 2: Deploy to GitHub Pages
+            </h2>
+            
+            <!-- Generated Files Preview -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: var(--primary-color); margin-bottom: 15px;">Generated Files Preview</h3>
+                <div id="filesPreview" class="file-grid">
+                    <!-- Generated files will appear here -->
+                </div>
+            </div>
+            
+            <!-- GitHub Actions -->
+            <div class="github-actions">
+                <div class="github-header">
+                    <span style="font-size: 24px;">🐙</span>
+                    <h3>One-Click GitHub Deployment</h3>
+                </div>
+                
+                <div class="github-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Download All Files</div>
+                            <div class="step-description">
+                                Download the complete updated website files as a ZIP archive
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Upload to GitHub</div>
+                            <div class="step-description">
+                                Go to your GitHub repository and upload/replace the files
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Commit Changes</div>
+                            <div class="step-description">
+                                Commit the changes with a descriptive message
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Wait for Deployment</div>
+                            <div class="step-description">
+                                GitHub Pages will automatically deploy in 1-2 minutes
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deployment Buttons -->
+            <div class="action-buttons">
+                <button id="previewBtn" class="btn btn-primary">
+                    <span>👁️</span> Preview Changes
+                </button>
+                <button id="downloadBtn" class="btn btn-success">
+                    <span>📦</span> Download All Files (ZIP)
+                </button>
+                <button id="deployBtn" class="btn btn-github">
+                    <span>🚀</span> Quick Deploy Guide
+                </button>
+            </div>
+        </section>
+
+        <!-- Preview Section -->
+        <section class="preview-section" id="previewSection" style="display: none;">
+            <h2 class="section-title">
+                <span>👁️</span>
+                Live Preview of Changes
+            </h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                This is exactly how your site will look after deployment
+            </p>
+            
+            <div id="previewGrid" class="preview-grid">
+                <!-- Preview cards will appear here -->
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4 style="color: var(--primary-color); margin-bottom: 5px;">Ready to Deploy?</h4>
+                        <p style="color: #718096; font-size: 14px;">
+                            Download all files and update your GitHub repository
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <button id="closePreviewBtn" class="btn btn-secondary">
+                            Close Preview
+                        </button>
+                        <button id="finalDownloadBtn" class="btn btn-success">
+                            <span>📦</span> Download All Files
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Current Documents -->
         <section class="upload-section">
             <h2 class="section-title">
                 <span>📚</span>
-                Current Documents (<span id="docCount">0</span>)
+                Current Documents in Database
             </h2>
             
-            <div id="documentsContainer">
-                <div id="documentsGrid" class="documents-grid">
-                    <!-- Documents will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Export Section -->
-            <div style="background: #f0f7ff; border: 2px solid var(--primary-color); border-radius: 12px; padding: 25px; margin-top: 30px;">
-                <h3 style="color: var(--primary-color); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                    <span>📤</span> Export for GitHub Pages
-                </h3>
-                <p style="color: #4a5568; margin-bottom: 20px;">
-                    Copy the generated JavaScript array and update your main site at: 
-                    <a href="https://hunter9201.github.io/advocate/" target="_blank" style="color: var(--primary-color); font-weight: 600;">
-                        https://hunter9201.github.io/advocate/
-                    </a>
-                </p>
-                
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">JavaScript Array Code</label>
-                    <div style="position: relative;">
-                        <textarea id="jsCodeOutput" class="form-control" rows="8" style="font-family: 'Courier New', monospace; font-size: 13px; resize: vertical;" readonly></textarea>
-                        <button id="copyCodeBtn" class="btn btn-secondary" style="position: absolute; top: 10px; right: 10px; padding: 8px 16px;">
-                            <span>📋</span> Copy
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <span style="color: var(--primary-color); font-weight: 600;">Total: </span>
+                        <span id="currentCount">0</span> documents
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="exportJsonBtn" class="btn" style="background: #e2e8f0; color: var(--dark-color); padding: 10px 20px;">
+                            Export JSON
+                        </button>
+                        <button id="backupBtn" class="btn btn-primary" style="padding: 10px 20px;">
+                            Backup Database
                         </button>
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 15px;">
-                    <button id="exportJsonBtn" class="btn btn-primary">
-                        <span>💾</span> Download JSON Backup
-                    </button>
-                    <button id="generateCodeBtn" class="btn btn-success">
-                        <span>🔄</span> Regenerate Code
-                    </button>
+                <div id="currentDocsGrid" class="preview-grid">
+                    <!-- Current documents will appear here -->
                 </div>
             </div>
         </section>
@@ -752,124 +821,175 @@
                 <h3>🔍 Processing Documents</h3>
                 <button class="close-modal" id="closeProcessingModal">&times;</button>
             </div>
-            <div style="padding: 30px 0; text-align: center;">
-                <div class="loading-spinner"></div>
-                <p style="color: var(--primary-color); margin-top: 20px; font-weight: 600;">
+            <div style="text-align: center; padding: 40px 0;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🤖</div>
+                <h4 style="color: var(--primary-color); margin-bottom: 10px;">Smart Analysis in Progress</h4>
+                <p style="color: #718096; margin-bottom: 30px;">
                     Extracting metadata from PDF files...
                 </p>
-                <p style="color: #718096; margin-top: 10px; font-size: 14px;">
-                    Analyzing filenames and detecting document information
-                </p>
+                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="progressBar" style="background: var(--primary-color); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal">
+    <!-- GitHub Guide Modal -->
+    <div id="githubModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>✅ Success!</h3>
-                <button class="close-modal" id="closeSuccessModal">&times;</button>
+                <h3>🐙 GitHub Deployment Guide</h3>
+                <button class="close-modal" id="closeGithubModal">&times;</button>
             </div>
-            <div style="padding: 20px 0; text-align: center;">
-                <div style="font-size: 48px; color: var(--success-color); margin-bottom: 20px;">🎉</div>
-                <p style="color: var(--primary-color); font-size: 18px; margin-bottom: 10px; font-weight: 600;">
-                    Documents Added Successfully!
-                </p>
-                <p style="color: #718096; margin-bottom: 25px;">
-                    <span id="successCount">0</span> documents have been processed and added to the database.
-                </p>
-                <button id="viewDocsBtn" class="btn btn-primary">
-                    <span>👁️</span> View Documents
-                </button>
+            <div style="padding: 20px 0;">
+                <div class="github-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Go to Your GitHub Repository</div>
+                            <div class="step-description">
+                                Open: <a href="https://github.com/hunter9201/advocate" target="_blank">github.com/hunter9201/advocate</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Upload Downloaded Files</div>
+                            <div class="step-description">
+                                Click "Add file" → "Upload files" and select all downloaded files
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Replace Existing Files</div>
+                            <div class="step-description">
+                                When prompted, choose to replace existing files
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Commit Changes</div>
+                            <div class="step-description">
+                                Add commit message: "Update legal documents" and click "Commit changes"
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Wait for Deployment</div>
+                            <div class="step-description">
+                                GitHub Pages will automatically deploy. Check:
+                                <a href="https://hunter9201.github.io/advocate/" target="_blank">Your Live Site</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 10px; border: 2px solid var(--primary-color);">
+                    <h4 style="color: var(--primary-color); margin-bottom: 10px;">📦 Alternative: Git Commands</h4>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-title">Terminal Commands</span>
+                        </div>
+                        <div style="color: #d4d4d4;">
+# Clone your repository<br>
+git clone https://github.com/hunter9201/advocate.git<br>
+cd advocate<br><br>
+# Replace files with downloaded ones<br>
+# (Copy all files from the ZIP to this folder)<br><br>
+# Commit and push<br>
+git add .<br>
+git commit -m "Update legal documents"<br>
+git push origin main
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // Configuration
-        const ADMIN_CONFIG = {
+        const CONFIG = {
             username: "admin",
             password: "admin123",
-            localStorageKey: "ugandaLegalDocuments",
+            localStorageKey: "ugandaLegalDocumentsDB",
+            githubRepo: "hunter9201/advocate",
+            liveSite: "https://hunter9201.github.io/advocate/",
             maxFiles: 5,
-            maxFileSize: 50 * 1024 * 1024, // 50MB
-            nextDocumentId: 1
+            maxFileSize: 50 * 1024 * 1024
         };
 
         // State
-        let currentUser = null;
         let documents = [];
         let selectedFiles = [];
-        let selectedCategory = null;
+        let nextId = 1;
 
         // DOM Elements
         const loginPage = document.getElementById('loginPage');
         const adminDashboard = document.getElementById('adminDashboard');
         const loginForm = document.getElementById('loginForm');
-        const loginMessage = document.getElementById('loginMessage');
-        const logoutBtn = document.getElementById('logoutBtn');
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const browseBtn = document.getElementById('browseBtn');
         const selectedFilesContainer = document.getElementById('selectedFilesContainer');
-        const fileList = document.getElementById('fileList');
-        const processFilesBtn = document.getElementById('processFilesBtn');
-        const documentsGrid = document.getElementById('documentsGrid');
-        const docCount = document.getElementById('docCount');
-        const jsCodeOutput = document.getElementById('jsCodeOutput');
-        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const fileGrid = document.getElementById('fileGrid');
+        const fileCount = document.getElementById('fileCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const processBtn = document.getElementById('processBtn');
+        const deploySection = document.getElementById('deploySection');
+        const previewBtn = document.getElementById('previewBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const deployBtn = document.getElementById('deployBtn');
+        const previewSection = document.getElementById('previewSection');
+        const closePreviewBtn = document.getElementById('closePreviewBtn');
+        const finalDownloadBtn = document.getElementById('finalDownloadBtn');
+        const currentDocsGrid = document.getElementById('currentDocsGrid');
+        const currentCount = document.getElementById('currentCount');
+        const totalDocs = document.getElementById('totalDocs');
+        const readyDocs = document.getElementById('readyDocs');
+        const lastUpdate = document.getElementById('lastUpdate');
+        const nextIdElement = document.getElementById('nextId');
         const exportJsonBtn = document.getElementById('exportJsonBtn');
-        const generateCodeBtn = document.getElementById('generateCodeBtn');
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const applyCategoryBtn = document.getElementById('applyCategoryBtn');
-        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const backupBtn = document.getElementById('backupBtn');
         const processingModal = document.getElementById('processingModal');
-        const successModal = document.getElementById('successModal');
-        const successCount = document.getElementById('successCount');
-        const viewDocsBtn = document.getElementById('viewDocsBtn');
-        const progressContainer = document.getElementById('progressContainer');
+        const githubModal = document.getElementById('githubModal');
         const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const progressPercent = document.getElementById('progressPercent');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            loadDocuments();
+            loadDatabase();
             setupEventListeners();
-            generateJavaScriptCode();
-            updateDocumentCount();
-            renderDocuments();
+            updateStats();
+            renderCurrentDocuments();
         });
 
         // Authentication
         function checkAuth() {
             const token = localStorage.getItem('adminToken');
             if (token === 'authenticated') {
-                currentUser = { username: 'admin' };
                 showAdminPanel();
             }
         }
 
         function login(username, password) {
-            if (username === ADMIN_CONFIG.username && password === ADMIN_CONFIG.password) {
-                currentUser = { username };
+            if (username === CONFIG.username && password === CONFIG.password) {
                 localStorage.setItem('adminToken', 'authenticated');
                 showAdminPanel();
-                showMessage(loginMessage, 'Login successful!', 'success');
                 return true;
-            } else {
-                showMessage(loginMessage, 'Invalid username or password', 'error');
-                return false;
             }
-        }
-
-        function logout() {
-            localStorage.removeItem('adminToken');
-            currentUser = null;
-            loginPage.style.display = 'flex';
-            adminDashboard.style.display = 'none';
+            return false;
         }
 
         function showAdminPanel() {
@@ -884,235 +1004,116 @@
                 e.preventDefault();
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
-                login(username, password);
+                if (login(username, password)) {
+                    showAdminPanel();
+                } else {
+                    alert('Invalid credentials');
+                }
             });
-
-            // Logout
-            logoutBtn.addEventListener('click', logout);
 
             // File Upload
             browseBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', handleFileSelect);
             
             // Drag and Drop
-            dropZone.addEventListener('dragover', handleDragOver);
-            dropZone.addEventListener('dragleave', handleDragLeave);
-            dropZone.addEventListener('drop', handleDrop);
-
-            // Process Files
-            processFilesBtn.addEventListener('click', processFiles);
-
-            // Category Selection
-            categoryButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    categoryButtons.forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedCategory = this.dataset.category;
-                });
-            });
-
-            // Bulk Actions
-            applyCategoryBtn.addEventListener('click', applyCategoryToAll);
-            clearSelectionBtn.addEventListener('click', clearAllFiles);
-
-            // Export
-            copyCodeBtn.addEventListener('click', copyCodeToClipboard);
-            exportJsonBtn.addEventListener('click', exportJson);
-            generateCodeBtn.addEventListener('click', generateJavaScriptCode);
-
-            // Modals
-            viewDocsBtn.addEventListener('click', () => {
-                hideModal(successModal);
-                renderDocuments();
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
             });
             
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                handleFileSelect({ target: { files: e.dataTransfer.files } });
+            });
+
+            // Buttons
+            clearBtn.addEventListener('click', clearSelection);
+            processBtn.addEventListener('click', processFiles);
+            previewBtn.addEventListener('click', showPreview);
+            downloadBtn.addEventListener('click', downloadAllFiles);
+            deployBtn.addEventListener('click', () => showModal(githubModal));
+            closePreviewBtn.addEventListener('click', () => previewSection.style.display = 'none');
+            finalDownloadBtn.addEventListener('click', downloadAllFiles);
+            exportJsonBtn.addEventListener('click', exportDatabase);
+            backupBtn.addEventListener('click', backupDatabase);
+            
+            // Modal close buttons
             document.getElementById('closeProcessingModal').addEventListener('click', () => hideModal(processingModal));
-            document.getElementById('closeSuccessModal').addEventListener('click', () => hideModal(successModal));
+            document.getElementById('closeGithubModal').addEventListener('click', () => hideModal(githubModal));
         }
 
         // File Handling
         function handleFileSelect(e) {
-            const files = Array.from(e.target.files);
-            addFilesToSelection(files);
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            const files = Array.from(e.dataTransfer.files);
-            addFilesToSelection(files);
-        }
-
-        function addFilesToSelection(files) {
-            // Check total file count
-            const totalFiles = selectedFiles.length + files.length;
-            if (totalFiles > ADMIN_CONFIG.maxFiles) {
-                alert(`Maximum ${ADMIN_CONFIG.maxFiles} files allowed. You selected ${files.length} files, but already have ${selectedFiles.length} files selected.`);
+            const files = Array.from(e.target.files || []);
+            
+            // Check limit
+            if (selectedFiles.length + files.length > CONFIG.maxFiles) {
+                alert(`Maximum ${CONFIG.maxFiles} files allowed. You already have ${selectedFiles.length} files selected.`);
                 return;
             }
-
-            // Filter only PDF files
-            const pdfFiles = files.filter(file => {
-                if (!file.type.includes('pdf') && !file.name.toLowerCase().endsWith('.pdf')) {
-                    alert(`File "${file.name}" is not a PDF file. Only PDF files are allowed.`);
-                    return false;
-                }
-                if (file.size > ADMIN_CONFIG.maxFileSize) {
-                    alert(`File "${file.name}" exceeds the 50MB size limit.`);
-                    return false;
-                }
-                return true;
-            });
-
-            // Add to selection
-            pdfFiles.forEach(file => {
-                const existingIndex = selectedFiles.findIndex(f => f.name === file.name);
-                if (existingIndex === -1) {
-                    selectedFiles.push({
-                        file: file,
-                        category: detectCategoryFromFilename(file.name),
-                        year: detectYearFromFilename(file.name),
-                        size: formatFileSize(file.size),
-                        pages: 0, // Will be estimated based on size
-                        description: generateDescriptionFromFilename(file.name)
-                    });
+            
+            // Add files
+            files.forEach(file => {
+                if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                    if (file.size <= CONFIG.maxFileSize) {
+                        selectedFiles.push(file);
+                    } else {
+                        alert(`File "${file.name}" exceeds 50MB limit`);
+                    }
+                } else {
+                    alert(`File "${file.name}" is not a PDF`);
                 }
             });
-
+            
             updateFileList();
         }
 
-        // Smart Detection Functions
-        function detectCategoryFromFilename(filename) {
-            const name = filename.toLowerCase();
-            
-            if (name.includes('constitution') || name.includes('act') || name.includes('cap')) {
-                return 'constitutional';
-            } else if (name.includes('criminal') || name.includes('penal') || name.includes('offense') || name.includes('offence')) {
-                return 'criminal';
-            } else if (name.includes('civil') || name.includes('tort') || name.includes('contract')) {
-                return 'civil';
-            } else if (name.includes('company') || name.includes('business') || name.includes('commercial') || name.includes('market')) {
-                return 'commercial';
-            } else if (name.includes('family') || name.includes('marriage') || name.includes('divorce') || name.includes('children')) {
-                return 'family';
-            } else if (name.includes('property') || name.includes('land') || name.includes('title') || name.includes('estate')) {
-                return 'property';
-            } else if (name.includes('rule') || name.includes('regulation') || name.includes('procedure') || name.includes('practice')) {
-                return 'procedure';
-            } else if (name.includes('employment') || name.includes('labour') || name.includes('worker')) {
-                return 'employment';
-            } else if (name.includes('international') || name.includes('treaty') || name.includes('convention') || name.includes('charter')) {
-                return 'international';
-            } else if (name.includes('admin') || name.includes('government') || name.includes('public') || name.includes('service')) {
-                return 'administrative';
-            }
-            
-            return 'administrative'; // Default category
-        }
-
-        function detectYearFromFilename(filename) {
-            // Look for 4-digit years
-            const yearMatch = filename.match(/\b(19|20)\d{2}\b/);
-            return yearMatch ? yearMatch[0] : new Date().getFullYear().toString();
-        }
-
-        function generateDescriptionFromFilename(filename) {
-            const nameWithoutExt = filename.replace('.pdf', '').replace(/_/g, ' ').replace(/-/g, ' ');
-            
-            // Remove year if present
-            const cleanedName = nameWithoutExt.replace(/\b(19|20)\d{2}\b/, '').trim();
-            
-            // Generate description based on content
-            if (cleanedName.toLowerCase().includes('act')) {
-                return `An Act relating to ${cleanedName.toLowerCase().replace('act', '').trim()}`;
-            } else if (cleanedName.toLowerCase().includes('rules')) {
-                return `Rules and regulations governing ${cleanedName.toLowerCase().replace('rules', '').trim()}`;
-            } else if (cleanedName.toLowerCase().includes('regulations')) {
-                return `Regulations for ${cleanedName.toLowerCase().replace('regulations', '').trim()}`;
-            } else {
-                return `Document relating to ${cleanedName}`;
-            }
-        }
-
-        function formatFileSize(bytes) {
-            const mb = bytes / (1024 * 1024);
-            return `${mb.toFixed(1)} MB`;
-        }
-
-        function estimatePagesFromSize(sizeMB) {
-            // Rough estimate: 0.03 MB per page for text PDFs
-            return Math.round(sizeMB / 0.03);
-        }
-
-        // File List Management
         function updateFileList() {
             if (selectedFiles.length === 0) {
                 selectedFilesContainer.style.display = 'none';
                 return;
             }
-
+            
             selectedFilesContainer.style.display = 'block';
-            fileList.innerHTML = '';
-
-            selectedFiles.forEach((fileData, index) => {
-                const file = fileData.file;
+            fileCount.textContent = selectedFiles.length;
+            fileGrid.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
                 const fileCard = document.createElement('div');
                 fileCard.className = 'file-card';
                 fileCard.innerHTML = `
-                    <div class="file-icon">📄</div>
-                    <div class="file-info">
+                    <div class="file-header">
                         <div class="file-name">${file.name}</div>
-                        <div class="file-meta">
-                            ${fileData.size} • Detected as: ${getCategoryName(fileData.category)} • Year: ${fileData.year}
+                        <button onclick="removeFile(${index})" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 18px;">
+                            ×
+                        </button>
+                    </div>
+                    <div class="file-info">
+                        <div class="info-group">
+                            <div class="info-label">Size</div>
+                            <div class="info-value">${formatFileSize(file.size)}</div>
                         </div>
-                        <div class="file-actions">
-                            <select class="form-control" style="width: 200px; font-size: 14px;" data-index="${index}" onchange="updateFileCategory(${index}, this.value)">
-                                <option value="${fileData.category}" selected>${getCategoryName(fileData.category)}</option>
-                                <option value="constitutional">Constitutional Law</option>
-                                <option value="criminal">Criminal Law</option>
-                                <option value="civil">Civil Law</option>
-                                <option value="commercial">Commercial Law</option>
-                                <option value="family">Family Law</option>
-                                <option value="property">Property Law</option>
-                                <option value="procedure">Procedure</option>
-                                <option value="administrative">Administrative</option>
-                                <option value="employment">Employment</option>
-                                <option value="international">International</option>
-                            </select>
-                            <input type="text" class="form-control" style="width: 100px; font-size: 14px;" 
-                                   value="${fileData.year}" placeholder="Year"
-                                   onchange="updateFileYear(${index}, this.value)">
-                            <button type="button" class="btn btn-danger" onclick="removeFile(${index})" style="padding: 8px 12px; font-size: 12px;">
-                                Remove
-                            </button>
+                        <div class="info-group">
+                            <div class="info-label">Detected Category</div>
+                            <div class="info-value">${detectCategory(file.name)}</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Detected Year</div>
+                            <div class="info-value">${detectYear(file.name)}</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Status</div>
+                            <div class="info-value" style="color: var(--warning-color);">Ready for processing</div>
                         </div>
                     </div>
                 `;
-                fileList.appendChild(fileCard);
+                fileGrid.appendChild(fileCard);
             });
-        }
-
-        function updateFileCategory(index, category) {
-            if (selectedFiles[index]) {
-                selectedFiles[index].category = category;
-            }
-        }
-
-        function updateFileYear(index, year) {
-            if (selectedFiles[index] && /^\d{4}$/.test(year)) {
-                selectedFiles[index].year = year;
-            }
         }
 
         function removeFile(index) {
@@ -1120,250 +1121,783 @@
             updateFileList();
         }
 
-        function applyCategoryToAll() {
-            if (!selectedCategory) {
-                alert('Please select a category first');
-                return;
-            }
-
-            selectedFiles.forEach(file => {
-                file.category = selectedCategory;
-            });
-
-            updateFileList();
-            alert(`Applied "${getCategoryName(selectedCategory)}" category to all files`);
-        }
-
-        function clearAllFiles() {
-            if (confirm('Are you sure you want to clear all selected files?')) {
+        function clearSelection() {
+            if (confirm('Clear all selected files?')) {
                 selectedFiles = [];
                 updateFileList();
                 fileInput.value = '';
             }
         }
 
-        // Process Files
+        // Smart Processing
         function processFiles() {
             if (selectedFiles.length === 0) {
-                alert('Please select files to upload first');
+                alert('Please select files first');
                 return;
             }
-
+            
             showModal(processingModal);
             
-            // Simulate processing with progress
-            let processed = 0;
-            const total = selectedFiles.length;
-            
-            progressContainer.style.display = 'block';
-            progressText.textContent = 'Processing files...';
-            
-            const processInterval = setInterval(() => {
-                processed++;
-                const percent = Math.round((processed / total) * 100);
-                progressBar.style.width = `${percent}%`;
-                progressPercent.textContent = `${percent}%`;
-                progressText.textContent = `Processing file ${processed} of ${total}...`;
+            // Simulate processing
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 20;
+                progressBar.style.width = `${progress}%`;
                 
-                if (processed === total) {
-                    clearInterval(processInterval);
+                if (progress >= 100) {
+                    clearInterval(interval);
                     setTimeout(() => {
                         hideModal(processingModal);
-                        addFilesToDatabase();
+                        analyzeFiles();
                     }, 500);
                 }
-            }, 300);
+            }, 200);
         }
 
-        function addFilesToDatabase() {
+        function analyzeFiles() {
             const newDocuments = [];
-            const date = new Date().toISOString().split('T')[0];
             
-            selectedFiles.forEach(fileData => {
-                const sizeMB = parseFloat(fileData.size);
-                const estimatedPages = estimatePagesFromSize(sizeMB);
+            selectedFiles.forEach(file => {
+                const filename = file.name;
+                const sizeMB = file.size / (1024 * 1024);
+                const estimatedPages = Math.round(sizeMB / 0.03);
                 
-                const newDoc = {
-                    id: ADMIN_CONFIG.nextDocumentId++,
-                    title: generateTitleFromFilename(fileData.file.name),
-                    description: fileData.description,
-                    filename: fileData.file.name,
-                    category: fileData.category,
-                    size: fileData.size,
+                const doc = {
+                    id: nextId++,
+                    title: generateTitle(filename),
+                    description: generateDescription(filename),
+                    filename: filename,
+                    category: detectCategory(filename),
+                    size: `${sizeMB.toFixed(1)} MB`,
                     pages: estimatedPages,
-                    date: date,
+                    date: new Date().toISOString().split('T')[0],
                     updated: false,
-                    year: fileData.year
+                    year: detectYear(filename)
                 };
                 
-                documents.push(newDoc);
-                newDocuments.push(newDoc);
+                newDocuments.push(doc);
+                documents.push(doc);
             });
             
-            saveDocuments();
-            showSuccessMessage(newDocuments.length);
-            clearAllFiles();
-            renderDocuments();
-            updateDocumentCount();
-            generateJavaScriptCode();
-            
-            // Hide progress
-            setTimeout(() => {
-                progressContainer.style.display = 'none';
-                progressBar.style.width = '0%';
-            }, 1000);
+            saveDatabase();
+            showDeploymentSection(newDocuments);
+            renderCurrentDocuments();
+            updateStats();
+            clearSelection();
         }
 
-        function generateTitleFromFilename(filename) {
+        // Smart Detection Functions
+        function detectCategory(filename) {
+            const name = filename.toLowerCase();
+            
+            const patterns = {
+                constitutional: ['constitution', 'act', 'cap'],
+                criminal: ['criminal', 'penal', 'offense', 'offence', 'theft', 'murder'],
+                civil: ['civil', 'tort', 'contract', 'agreement'],
+                commercial: ['company', 'business', 'commercial', 'market', 'capital', 'use', 'trade'],
+                family: ['family', 'marriage', 'divorce', 'children', 'child'],
+                property: ['property', 'land', 'title', 'estate', 'registration'],
+                procedure: ['rule', 'regulation', 'procedure', 'practice', 'guideline'],
+                administrative: ['admin', 'government', 'public', 'service', 'commission'],
+                employment: ['employment', 'labour', 'labor', 'worker', 'compensation'],
+                international: ['international', 'treaty', 'convention', 'charter', 'united nations']
+            };
+            
+            for (const [category, keywords] of Object.entries(patterns)) {
+                if (keywords.some(keyword => name.includes(keyword))) {
+                    return category;
+                }
+            }
+            
+            return 'administrative';
+        }
+
+        function detectYear(filename) {
+            const match = filename.match(/\b(19|20)\d{2}\b/);
+            return match ? match[0] : new Date().getFullYear().toString();
+        }
+
+        function generateTitle(filename) {
             // Remove extension and clean up
-            let title = filename.replace('.pdf', '')
-                              .replace(/_/g, ' ')
-                              .replace(/-/g, ' ')
-                              .replace(/\b(19|20)\d{2}\b/, '')
-                              .replace(/\s+/g, ' ')
-                              .trim();
-            
-            // Capitalize first letter of each word
-            title = title.split(' ').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            ).join(' ');
-            
-            return title;
+            return filename
+                .replace('.pdf', '')
+                .replace(/_/g, ' ')
+                .replace(/-/g, ' ')
+                .replace(/\b(19|20)\d{2}\b/, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
         }
 
-        function showSuccessMessage(count) {
-            successCount.textContent = count;
-            showModal(successModal);
+        function generateDescription(filename) {
+            const title = generateTitle(filename).toLowerCase();
+            const category = detectCategory(filename);
+            
+            const descriptions = {
+                constitutional: `An Act relating to ${title}`,
+                criminal: `Legal provisions regarding ${title} under criminal law`,
+                commercial: `Rules and regulations governing ${title}`,
+                procedure: `Procedural guidelines for ${title}`,
+                administrative: `Administrative provisions for ${title}`,
+                family: `Legal framework for ${title} in family law`,
+                property: `Regulations concerning ${title} in property law`,
+                employment: `Employment law provisions for ${title}`,
+                international: `International agreements and conventions on ${title}`
+            };
+            
+            return descriptions[category] || `Legal document relating to ${title}`;
         }
 
-        // Document Management
-        function loadDocuments() {
-            const saved = localStorage.getItem(ADMIN_CONFIG.localStorageKey);
+        // Database Management
+        function loadDatabase() {
+            const saved = localStorage.getItem(CONFIG.localStorageKey);
             if (saved) {
                 const data = JSON.parse(saved);
                 documents = data.documents || [];
-                ADMIN_CONFIG.nextDocumentId = data.nextId || (documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1);
+                nextId = data.nextId || (documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1);
+                lastUpdate.textContent = data.lastUpdate || 'Never';
             }
         }
 
-        function saveDocuments() {
+        function saveDatabase() {
             const data = {
                 documents: documents,
-                nextId: ADMIN_CONFIG.nextDocumentId
+                nextId: nextId,
+                lastUpdate: new Date().toLocaleString()
             };
-            localStorage.setItem(ADMIN_CONFIG.localStorageKey, JSON.stringify(data));
+            localStorage.setItem(CONFIG.localStorageKey, JSON.stringify(data));
+            updateStats();
         }
 
-        function updateDocumentCount() {
-            docCount.textContent = documents.length;
+        function updateStats() {
+            totalDocs.textContent = documents.length;
+            readyDocs.textContent = selectedFiles.length;
+            nextIdElement.textContent = nextId;
+            currentCount.textContent = documents.length;
         }
 
-        function renderDocuments() {
-            documentsGrid.innerHTML = '';
+        // Deployment Section
+        function showDeploymentSection(newDocs) {
+            deploySection.style.display = 'block';
             
-            if (documents.length === 0) {
-                documentsGrid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📂</div>
-                        <h3 style="color: var(--primary-color); margin-bottom: 10px;">No Documents Yet</h3>
-                        <p>Upload PDF files to get started</p>
+            // Update files preview
+            const filesPreview = document.getElementById('filesPreview');
+            filesPreview.innerHTML = `
+                <div class="file-card">
+                    <div class="file-name">index.html</div>
+                    <div class="file-info">
+                        <div class="info-group">
+                            <div class="info-label">File Type</div>
+                            <div class="info-value">Main Website File</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Documents</div>
+                            <div class="info-value">${documents.length} documents included</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Status</div>
+                            <div class="info-value" style="color: var(--success-color);">Ready for deployment</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="file-card">
+                    <div class="file-name">database.json</div>
+                    <div class="file-info">
+                        <div class="info-group">
+                            <div class="info-label">File Type</div>
+                            <div class="info-value">Data Backup</div>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">Size</div>
+                            <div class="info-value">${(JSON.stringify(documents).length / 1024).toFixed(1)} KB</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Generate preview cards
+            generatePreviewCards(newDocs);
+        }
+
+        function generatePreviewCards(newDocs) {
+            const previewGrid = document.getElementById('previewGrid');
+            previewGrid.innerHTML = '';
+            
+            newDocs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <div class="preview-id">#${doc.id}</div>
+                    <div class="preview-title">${doc.title}</div>
+                    <div style="font-size: 14px; color: #718096; margin-bottom: 15px;">${doc.description}</div>
+                    <div class="preview-meta">
+                        <div class="meta-item">
+                            <span>📄</span>
+                            <span>${doc.filename}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📂</span>
+                            <span>${doc.category}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>${doc.year}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📑</span>
+                            <span>${doc.pages} pages</span>
+                        </div>
                     </div>
                 `;
-                return;
-            }
-            
-            // Show latest documents first
-            const sortedDocs = [...documents].sort((a, b) => b.id - a.id);
-            
-            sortedDocs.forEach(doc => {
-                const docCard = document.createElement('div');
-                docCard.className = 'document-card';
-                docCard.innerHTML = `
-                    <div class="document-header">
-                        <div class="document-id">#${doc.id}</div>
-                        <div style="font-size: 12px; color: #718096;">${doc.date}</div>
-                    </div>
-                    <div class="document-title">${doc.title}</div>
-                    <div class="document-category">${getCategoryName(doc.category)}</div>
-                    <p style="color: #4a5568; font-size: 14px; margin-bottom: 15px;">${doc.description}</p>
-                    <div class="document-meta">
-                        <span title="Filename">📄 ${doc.filename}</span>
-                        <span title="Year">📅 ${doc.year}</span>
-                        <span title="File size">💾 ${doc.size}</span>
-                        <span title="Pages">📑 ${doc.pages} pages</span>
-                    </div>
-                `;
-                documentsGrid.appendChild(docCard);
+                previewGrid.appendChild(card);
             });
         }
 
-        // Export Functions
-        function generateJavaScriptCode() {
-            // Create JavaScript array matching your main site structure
-            const jsArray = documents.map(doc => ({
-                id: doc.id,
-                title: doc.title,
-                description: doc.description,
-                filename: doc.filename,
-                category: doc.category,
-                size: doc.size,
-                pages: doc.pages,
-                date: doc.date,
-                updated: doc.updated,
-                year: doc.year
-            }));
-            
-            const jsCode = `const ugandaLegalDocuments = ${JSON.stringify(jsArray, null, 2)};`;
-            jsCodeOutput.value = jsCode;
+        function showPreview() {
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function copyCodeToClipboard() {
-            jsCodeOutput.select();
-            jsCodeOutput.setSelectionRange(0, 99999);
-            document.execCommand('copy');
+        // File Generation and Download
+        function downloadAllFiles() {
+            // Generate complete index.html
+            const indexHtml = generateCompleteIndexHtml();
             
-            // Show temporary success
-            const originalText = copyCodeBtn.innerHTML;
-            copyCodeBtn.innerHTML = '<span>✅</span> Copied!';
-            setTimeout(() => {
-                copyCodeBtn.innerHTML = originalText;
-            }, 2000);
+            // Create ZIP file
+            const zip = new JSZip();
+            
+            // Add index.html
+            zip.file("index.html", indexHtml);
+            
+            // Add database backup
+            zip.file("database.json", JSON.stringify(documents, null, 2));
+            
+            // Add README with instructions
+            const readme = generateReadme();
+            zip.file("README.md", readme);
+            
+            // Generate ZIP
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                // Create download link
+                const a = document.createElement("a");
+                const url = URL.createObjectURL(content);
+                a.href = url;
+                a.download = `advocate-update-${new Date().toISOString().split('T')[0]}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Show success message
+                alert(`✅ All files downloaded successfully!\n\nUpload these files to your GitHub repository:\n${CONFIG.githubRepo}`);
+            });
         }
 
-        function exportJson() {
+        function generateCompleteIndexHtml() {
+            // This generates the ENTIRE website HTML with all documents
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uganda Legal Documents Library</title>
+    <style>
+        /* All your CSS styles from the main site */
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #c53030;
+            --accent-color: #2a4365;
+            --light-color: #f7fafc;
+            --dark-color: #2d3748;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .site-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            border-bottom: 3px solid var(--secondary-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .logo-text .tagline {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 30px;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .page-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            font-size: 1rem;
+            color: #4a5568;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Stats Summary */
+        .stats-summary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-weight: 700;
+            color: #ffd700;
+            margin-right: 5px;
+        }
+        
+        /* Search Section */
+        .search-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background-color: white;
+            color: var(--dark-color);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+        }
+        
+        /* PDF Grid */
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .pdf-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            height: 100%;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pdf-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .pdf-card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            position: relative;
+        }
+        
+        .pdf-title {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+            line-height: 1.3;
+            min-height: 40px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .pdf-card-body {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pdf-description {
+            color: #4a5568;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            font-size: 0.85rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 3px solid var(--secondary-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .pdf-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+        
+        @media (min-width: 1025px) {
+            .pdf-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo-icon">⚖️</div>
+                <div class="logo-text">
+                    <h1>UGANDA LEGAL DOCUMENTS LIBRARY</h1>
+                    <div class="tagline">Complete collection of Ugandan laws, acts, and legal procedures</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <h2>📚 Uganda Laws</h2>
+            <p>Browse, search, and access complete Ugandan legal laws. Click any card to open the document.</p>
+        </div>
+
+        <div class="stats-summary">
+            <div class="stat-item">
+                <span class="stat-number">${documents.length}</span>Total Documents
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${getCategoryCount('constitutional')}</span>Constitutional Laws
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${getCategoryCount('criminal')}</span>Criminal Laws
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${getCategoryCount('commercial')}</span>Commercial Laws
+            </div>
+        </div>
+
+        <section class="search-section">
+            <div class="search-input-wrapper">
+                <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--primary-color);">🔍</div>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by title, category, or year...">
+            </div>
+        </section>
+
+        <div class="pdf-grid" id="pdfGrid">
+            ${generateDocumentCards()}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; text-align: center;">
+            <h3>Uganda Legal Documents Library</h3>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 10px;">
+                Complete collection of Ugandan laws and legal procedures for reference and educational purposes.
+            </p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; opacity: 0.8;">
+                &copy; ${new Date().getFullYear()} Uganda Legal Documents Library. For informational and educational purposes.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Documents Data - AUTO-GENERATED
+        const ugandaLegalDocuments = ${JSON.stringify(documents, null, 2)};
+
+        // JavaScript code for the main site
+        const pdfGrid = document.getElementById('pdfGrid');
+        const searchInput = document.getElementById('searchInput');
+        
+        let currentSearch = '';
+        
+        function getPDFUrl(filename) {
+            return encodeURI(filename.trim().replace(/\\s+/g, ' '));
+        }
+        
+        function openPDF(doc) {
+            window.open(getPDFUrl(doc.filename), '_blank');
+        }
+        
+        function renderDocuments() {
+            pdfGrid.innerHTML = '';
+            
+            let filteredDocs = ugandaLegalDocuments;
+            
+            if (currentSearch.trim()) {
+                const searchLower = currentSearch.toLowerCase();
+                filteredDocs = ugandaLegalDocuments.filter(doc => 
+                    doc.title.toLowerCase().includes(searchLower) ||
+                    doc.description.toLowerCase().includes(searchLower) ||
+                    doc.category.toLowerCase().includes(searchLower) ||
+                    doc.year.toString().includes(currentSearch)
+                );
+            }
+            
+            filteredDocs.sort((a, b) => a.title.localeCompare(b.title));
+            
+            if (filteredDocs.length === 0) {
+                pdfGrid.innerHTML = \`
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #718096;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🔍</div>
+                        <h3 style="color: var(--primary-color);">No documents found</h3>
+                        <p>Try a different search term</p>
+                    </div>
+                \`;
+                return;
+            }
+            
+            filteredDocs.forEach(doc => {
+                const docCard = document.createElement('div');
+                docCard.className = 'pdf-card';
+                docCard.onclick = () => openPDF(doc);
+                
+                const categoryNames = {
+                    constitutional: "Constitutional",
+                    criminal: "Criminal",
+                    civil: "Civil",
+                    commercial: "Commercial",
+                    family: "Family",
+                    property: "Property",
+                    procedure: "Procedure",
+                    administrative: "Administrative",
+                    employment: "Employment",
+                    international: "International"
+                };
+                
+                docCard.innerHTML = \`
+                    <div class="pdf-card-header">
+                        <h3 class="pdf-title">\${doc.title}</h3>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.9;">
+                            <span>\${doc.year}</span>
+                            <span>\${categoryNames[doc.category] || doc.category}</span>
+                        </div>
+                    </div>
+                    <div class="pdf-card-body">
+                        <p class="pdf-description">\${doc.description}</p>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #718096; margin-top: auto;">
+                            <span>📄 \${doc.size}</span>
+                            <span>📑 \${doc.pages} pages</span>
+                        </div>
+                    </div>
+                \`;
+                
+                pdfGrid.appendChild(docCard);
+            });
+        }
+        
+        searchInput.addEventListener('input', function() {
+            currentSearch = this.value.trim();
+            renderDocuments();
+        });
+        
+        // Initial render
+        renderDocuments();
+    </script>
+</body>
+</html>`;
+        }
+
+        function getCategoryCount(category) {
+            return documents.filter(doc => doc.category === category).length;
+        }
+
+        function generateDocumentCards() {
+            return documents.map(doc => {
+                const categoryNames = {
+                    constitutional: "Constitutional",
+                    criminal: "Criminal",
+                    civil: "Civil",
+                    commercial: "Commercial",
+                    family: "Family",
+                    property: "Property",
+                    procedure: "Procedure",
+                    administrative: "Administrative",
+                    employment: "Employment",
+                    international: "International"
+                };
+                
+                return `
+            <div class="pdf-card" onclick="window.open('${encodeURI(doc.filename)}', '_blank')">
+                <div class="pdf-card-header">
+                    <h3 class="pdf-title">${doc.title}</h3>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.9;">
+                        <span>${doc.year}</span>
+                        <span>${categoryNames[doc.category] || doc.category}</span>
+                    </div>
+                </div>
+                <div class="pdf-card-body">
+                    <p class="pdf-description">${doc.description}</p>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #718096; margin-top: auto;">
+                        <span>📄 ${doc.size}</span>
+                        <span>📑 ${doc.pages} pages</span>
+                    </div>
+                </div>
+            </div>`;
+            }).join('\n');
+        }
+
+        function generateReadme() {
+            return `# Uganda Legal Documents Update
+
+## Files Included:
+
+1. **index.html** - Complete website with ${documents.length} legal documents
+2. **database.json** - Backup of all document data
+
+## Deployment Instructions:
+
+1. Go to: https://github.com/hunter9201/advocate
+2. Click "Add file" → "Upload files"
+3. Upload ALL files from this ZIP
+4. Replace existing files when prompted
+5. Add commit message: "Update legal documents"
+6. Click "Commit changes"
+7. Wait 1-2 minutes for GitHub Pages to deploy
+8. Visit: https://hunter9201.github.io/advocate/
+
+## Total Documents: ${documents.length}
+
+## Last Updated: ${new Date().toLocaleString()}
+
+## Note:
+This update was generated automatically by the Admin Panel.`;
+        }
+
+        // Backup and Export
+        function exportDatabase() {
+            const dataStr = JSON.stringify(documents, null, 2);
+            downloadFile(dataStr, 'uganda-laws-database.json', 'application/json');
+        }
+
+        function backupDatabase() {
             const data = {
                 documents: documents,
-                exportedAt: new Date().toISOString(),
-                totalDocuments: documents.length
+                nextId: nextId,
+                exportedAt: new Date().toISOString()
             };
-            
-            const jsonStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const dataStr = JSON.stringify(data, null, 2);
+            downloadFile(dataStr, `uganda-laws-backup-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+        }
+
+        // Utility Functions
+        function formatFileSize(bytes) {
+            const mb = bytes / (1024 * 1024);
+            if (mb < 1) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${mb.toFixed(1)} MB`;
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `uganda-laws-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }
-
-        // Utility Functions
-        function getCategoryName(category) {
-            const categories = {
-                constitutional: "Constitutional Law",
-                criminal: "Criminal Law",
-                civil: "Civil Law",
-                commercial: "Commercial Law",
-                family: "Family Law",
-                property: "Property Law",
-                procedure: "Procedure",
-                administrative: "Administrative",
-                employment: "Employment Law",
-                international: "International Law"
-            };
-            return categories[category] || category;
         }
 
         function showModal(modal) {
@@ -1374,19 +1908,56 @@
             modal.style.display = 'none';
         }
 
-        function showMessage(element, text, type) {
-            element.textContent = text;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
+        function renderCurrentDocuments() {
+            currentDocsGrid.innerHTML = '';
+            
+            if (documents.length === 0) {
+                currentDocsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📂</div>
+                        <h3 style="color: var(--primary-color);">No documents yet</h3>
+                        <p>Upload PDF files to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show latest 12 documents
+            const recentDocs = [...documents].sort((a, b) => b.id - a.id).slice(0, 12);
+            
+            recentDocs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <div class="preview-id">#${doc.id}</div>
+                    <div class="preview-title">${doc.title}</div>
+                    <div style="font-size: 14px; color: #718096; margin-bottom: 15px;">${doc.description}</div>
+                    <div class="preview-meta">
+                        <div class="meta-item">
+                            <span>📄</span>
+                            <span>${doc.filename}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📂</span>
+                            <span>${doc.category}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>${doc.year}</span>
+                        </div>
+                    </div>
+                `;
+                currentDocsGrid.appendChild(card);
+            });
         }
 
-        // Make functions available globally for inline event handlers
-        window.updateFileCategory = updateFileCategory;
-        window.updateFileYear = updateFileYear;
+        // Make functions available globally
         window.removeFile = removeFile;
+        window.showModal = showModal;
+        window.hideModal = hideModal;
     </script>
+
+    <!-- JSZip Library for creating ZIP files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </body>
 </html>
