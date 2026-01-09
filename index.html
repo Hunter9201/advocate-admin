@@ -708,6 +708,82 @@ function ghHeaders(){
   return h;
 }
 
+/* --- FIXED GITHUB API FUNCTIONS --- */
+async function ghGetContents(path, cfg=currentCfg()){
+  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(cfg.branch)}`;
+  const r = await fetch(url, {headers: ghHeaders()});
+  if (r.status === 404) return {status:404};
+  if (!r.ok) {
+    const errorText = await r.text();
+    console.error(`GET ${path} failed: ${r.status}`, errorText);
+    throw new Error(`GET ${path} failed: ${r.status} ${errorText}`);
+  }
+  return await r.json();
+}
+
+async function ghPutContents(path, base64Content, message, sha=null, cfg=currentCfg()){
+  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
+  const body = { message, content: base64Content, branch: cfg.branch };
+  if (sha) body.sha = sha;
+  const r = await fetch(url, { 
+    method: "PUT", 
+    headers: {...ghHeaders(), "Content-Type":"application/json"}, 
+    body: JSON.stringify(body) 
+  });
+  if (!r.ok) {
+    const errorText = await r.text();
+    console.error(`PUT ${path} failed: ${r.status}`, errorText);
+    throw new Error(`PUT ${path} failed: ${r.status} ${errorText}`);
+  }
+  return await r.json();
+}
+
+async function ghDeleteContents(path, message, sha, cfg=currentCfg()){
+  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
+  const r = await fetch(url, { 
+    method: "DELETE", 
+    headers: {...ghHeaders(), "Content-Type":"application/json"}, 
+    body: JSON.stringify({ message, sha, branch: cfg.branch }) 
+  });
+  if (!r.ok) {
+    const errorText = await r.text();
+    console.error(`DELETE ${path} failed: ${r.status}`, errorText);
+    throw new Error(`DELETE ${path} failed: ${r.status} ${errorText}`);
+  }
+  return await r.json();
+}
+
+async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
+  return new Promise(async (resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = btoa(new Uint8Array(reader.result).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        
+        // First, check if file already exists to get its SHA
+        let existingSha = null;
+        try {
+          const existing = await ghGetContents(filename, cfg);
+          if (existing && existing.sha) {
+            existingSha = existing.sha;
+            log(`File ${filename} exists with SHA: ${existingSha.substring(0, 8)}...`);
+          }
+        } catch (error) {
+          // File doesn't exist, that's fine
+          console.log(`File ${filename} doesn't exist, will create new`);
+        }
+        
+        const result = await ghPutContents(filename, base64, message, existingSha, cfg);
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 /* --- ENHANCED PDF FILENAME PARSING FOR LEGAL DOCUMENTS --- */
 function extractDocumentInfoFromFilename(filename) {
   // Remove .pdf extension and clean up
@@ -913,6 +989,15 @@ function extractKeywordsFromTitle(title) {
 }
 
 /* --- ENHANCED PDF CONTENT EXTRACTION --- */
+function readFileAsArrayBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 async function extractPDFMetadata(file) {
   try {
     const arrayBuffer = await readFileAsArrayBuffer(file);
@@ -947,16 +1032,6 @@ async function extractPDFMetadata(file) {
   }
   
   return null;
-}
-
-/* --- FILE UPLOAD HANDLING --- */
-function readFileAsArrayBuffer(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
 }
 
 async function getPDFPageCount(file) {
@@ -1381,15 +1456,24 @@ jobs:
         uses: actions/deploy-pages@v4
 `;
 
+    // Check if workflow already exists
+    let sha = null;
+    try {
+      const existing = await ghGetContents(workflowPath, cfg);
+      if (existing.sha) sha = existing.sha;
+    } catch {
+      // File doesn't exist, that's ok
+    }
+    
     await ghPutContents(
       workflowPath,
       toBase64Utf8(workflowContent),
       'Add GitHub Pages deployment workflow',
-      null,
+      sha,
       cfg
     );
     
-    log('✓ Created GitHub Pages deployment workflow');
+    log('✓ Created/updated GitHub Pages deployment workflow');
     return true;
   } catch (error) {
     console.error('Error creating workflow:', error);
@@ -1403,58 +1487,20 @@ function loadAutoPublishSetting() {
   autoPublishCheckbox.checked = enabled;
 }
 
-/* --- GITHUB API FUNCTIONS --- */
-async function ghGetContents(path, cfg=currentCfg()){
-  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(cfg.branch)}`;
-  const r = await fetch(url, {headers: ghHeaders()});
-  if (r.status === 404) return {status:404};
-  if (!r.ok) throw new Error(`GET ${path} failed: ${r.status} ${await r.text()}`);
-  return await r.json();
-}
-
-async function ghPutContents(path, base64Content, message, sha=null, cfg=currentCfg()){
-  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
-  const body = { message, content: base64Content, branch: cfg.branch };
-  if (sha) body.sha = sha;
-  const r = await fetch(url, { method: "PUT", headers: {...ghHeaders(), "Content-Type":"application/json"}, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error(`PUT ${path} failed: ${r.status} ${await r.text()}`);
-  return await r.json();
-}
-
-async function ghDeleteContents(path, message, sha, cfg=currentCfg()){
-  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
-  const r = await fetch(url, { method: "DELETE", headers: {...ghHeaders(), "Content-Type":"application/json"}, body: JSON.stringify({ message, sha, branch: cfg.branch }) });
-  if (!r.ok) throw new Error(`DELETE ${path} failed: ${r.status} ${await r.text()}`);
-  return await r.json();
-}
-
-async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64 = btoa(new Uint8Array(reader.result).reduce((data, byte) => data + String.fromCharCode(byte), ''));
-        const result = await ghPutContents(filename, base64, message, null, cfg);
-        resolve(result);
-      } catch (error) {
-        reject(error);
-      }
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
 /* Token quick test */
 async function verifyTokenAccess(){
   try{
     const cfg = currentCfg();
     const r = await fetch(`${API_BASE}/repos/${cfg.owner}/${cfg.repo}`, {headers: ghHeaders()});
-    if (!r.ok) { tokenOk("Token invalid for repo"); return false; }
+    if (!r.ok) { 
+      tokenOk("Token invalid for repo"); 
+      return false; 
+    }
     tokenOk("Token OK");
     await checkGitHubPagesStatus();
     return true;
-  }catch{
+  }catch(error){
+    console.error('Token verification failed:', error);
     tokenOk("Token check failed");
     return false;
   }
@@ -1462,13 +1508,24 @@ async function verifyTokenAccess(){
 
 /* Documents.json */
 async function loadDocumentsJson(){
-  const got = await ghGetContents(currentCfg().documentsPath);
-  if (got.status === 404) return { arr: [], sha: null };
-  const sha = got.sha;
-  const text = fromBase64Utf8(got.content);
-  let arr = [];
-  try{ arr = JSON.parse(text); if(!Array.isArray(arr)) arr=[]; }catch{ arr=[]; }
-  return { arr, sha };
+  try {
+    const got = await ghGetContents(currentCfg().documentsPath);
+    if (got.status === 404) return { arr: [], sha: null };
+    const sha = got.sha;
+    const text = fromBase64Utf8(got.content);
+    let arr = [];
+    try{ 
+      arr = JSON.parse(text); 
+      if(!Array.isArray(arr)) arr=[]; 
+    }catch(e){ 
+      log(`Warning: Could not parse documents.json: ${e.message}`);
+      arr=[]; 
+    }
+    return { arr, sha };
+  } catch (error) {
+    console.error('Error loading documents.json:', error);
+    return { arr: [], sha: null };
+  }
 }
 
 function renderDocumentsAdmin(arr){
@@ -1700,7 +1757,7 @@ updateBtn.addEventListener('click', async ()=>{
     resetForm();
   }catch(err){ 
     console.error(err); 
-    log(String(err)); 
+    log(`Error updating document: ${err.message}`); 
     setStatus("Error: " + err.message); 
     alert("Update failed:\n" + err.message); 
   }
@@ -1738,7 +1795,7 @@ async function deleteDocument(docId){
     await refreshDocumentsList();
   }catch(err){ 
     console.error(err); 
-    log(String(err)); 
+    log(`Error deleting document: ${err.message}`); 
     setStatus("Error: " + err.message); 
     alert("Delete failed:\n" + err.message); 
   }
@@ -1766,7 +1823,9 @@ exportBtn.addEventListener('click', async ()=>{
     a.download = 'uganda-legal-documents-export.json'; 
     a.click();
     URL.revokeObjectURL(a.href);
-  }catch(err){ alert('Export failed: '+err.message); }
+  }catch(err){ 
+    alert('Export failed: '+err.message); 
+  }
 });
 
 importBtn.addEventListener('click', ()=> importInput.click());
@@ -1811,12 +1870,21 @@ importInput.addEventListener('change', async (e)=>{
 /* --- ENHANCED PUBLISH FUNCTION --- */
 publishBtn.addEventListener('click', async ()=>{
   try{
-    if (!getToken()){ alert("Set your GitHub token first."); return; }
-    if (selectedFiles.length === 0){ alert("Please select legal PDF files to upload."); return; }
+    if (!getToken()){ 
+      alert("Set your GitHub token first."); 
+      return; 
+    }
+    if (selectedFiles.length === 0){ 
+      alert("Please select legal PDF files to upload."); 
+      return; 
+    }
 
     // verify token once
     const ok = await verifyTokenAccess(); 
-    if (!ok){ alert("Token not authorized for this repo."); return; }
+    if (!ok){ 
+      alert("Token not authorized for this repo."); 
+      return; 
+    }
 
     const cfg = currentCfg();
     setStatus("Starting legal document upload process…"); 
@@ -1832,18 +1900,26 @@ publishBtn.addEventListener('click', async ()=>{
     setStatus("Loading existing legal documents…");
     let arr = []; 
     let sha = null;
-    const got = await ghGetContents(cfg.documentsPath, cfg);
-    if (got.status !== 404){ 
-      sha = got.sha; 
-      try{ 
-        arr = JSON.parse(fromBase64Utf8(got.content)); 
-        if(!Array.isArray(arr)) arr=[]; 
-      }catch{ arr=[]; } 
-      log(`Loaded ${arr.length} existing legal documents`); 
+    try {
+      const got = await ghGetContents(cfg.documentsPath, cfg);
+      if (got.status !== 404){ 
+        sha = got.sha; 
+        try{ 
+          arr = JSON.parse(fromBase64Utf8(got.content)); 
+          if(!Array.isArray(arr)) arr=[]; 
+        }catch(e){ 
+          log(`Warning: Could not parse documents.json: ${e.message}`);
+          arr=[]; 
+        } 
+        log(`Loaded ${arr.length} existing legal documents`); 
+      }
+    } catch (error) {
+      log(`Error loading documents.json: ${error.message}`);
+      arr = [];
     }
 
     // Generate new IDs
-    let nextId = arr.length > 0 ? Math.max(...arr.map(d => d.id)) + 1 : 1;
+    let nextId = arr.length > 0 ? Math.max(...arr.map(d => d.id || 0)) + 1 : 1;
     
     const newDocuments = [];
     
@@ -1866,7 +1942,7 @@ publishBtn.addEventListener('click', async ()=>{
         
         setStatus(`Uploading ${enhancedData.title}…`);
         
-        // Upload PDF file to GitHub
+        // Upload PDF file to GitHub with proper error handling
         await uploadPDFFile(
           file,
           file.name,
