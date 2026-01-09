@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,7 +151,7 @@
     margin-left: 6px;
   }
   
-  /* PDF upload styles */
+  /* Document upload styles - UPDATED FOR ALL FILE TYPES */
   .upload-area {
     border: 2px dashed var(--line);
     border-radius: 10px;
@@ -208,6 +207,15 @@
     white-space: nowrap;
     flex: 1;
     margin-right: 8px;
+  }
+  
+  .file-type {
+    font-size: 12px;
+    color: var(--muted);
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
   }
   
   .file-size {
@@ -285,6 +293,24 @@
   
   .publish-checkbox input {
     width: auto;
+  }
+  
+  /* File type icons */
+  .file-icon {
+    font-size: 20px;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  /* Allowed file types display */
+  .allowed-types {
+    display: inline-block;
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 8px;
   }
   
   @media (max-width:900px){ 
@@ -387,12 +413,15 @@
           </div>
         </div>
 
-        <!-- PDF Upload Area -->
+        <!-- Document Upload Area - UPDATED FOR ALL FILES -->
         <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">📄</div>
-          <div><strong>Click to select PDF files or drag & drop here</strong></div>
-          <div class="muted small">Upload up to 4 PDF documents at once (Max 50MB each)</div>
-          <input type="file" id="pdfInput" accept=".pdf" multiple style="display:none">
+          <div class="upload-icon">📁</div>
+          <div><strong>Click to select files or drag & drop here</strong></div>
+          <div class="muted small">
+            Upload up to 4 documents at once (Max 50MB each)
+            <span class="allowed-types">PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, RTF, ODT, ODS, ZIP</span>
+          </div>
+          <input type="file" id="fileInput" multiple style="display:none">
         </div>
 
         <!-- Files Preview -->
@@ -404,6 +433,12 @@
           <div class="muted small">
             Document titles will be extracted from filenames. Year and other details will be auto-generated.
           </div>
+        </div>
+
+        <!-- Manual title input -->
+        <div id="manualTitleSection" style="margin-top:16px; display:none;">
+          <label>Document Title (edit if needed)</label>
+          <input type="text" id="manualTitle" placeholder="Enter document title...">
         </div>
 
         <!-- GitHub Pages Publish Section -->
@@ -473,7 +508,7 @@
 <script>
 /* ===========================
    Uganda Legal Documents Admin Panel
-   Enhanced with GitHub Pages Publishing
+   ENHANCED TO SUPPORT ALL DOCUMENT TYPES
    =========================== */
 
 /* --- STORAGE KEYS --- */
@@ -507,6 +542,58 @@ const categoryNames = {
     international: "International Law",
     other: "Other Acts"
 };
+
+/* --- FILE TYPE ICONS AND INFO --- */
+const fileTypeInfo = {
+  // Document files
+  'pdf': { icon: '📄', name: 'PDF', color: '#e53e3e' },
+  'doc': { icon: '📝', name: 'Word', color: '#2b579a' },
+  'docx': { icon: '📝', name: 'Word', color: '#2b579a' },
+  'txt': { icon: '📃', name: 'Text', color: '#718096' },
+  'rtf': { icon: '📃', name: 'Rich Text', color: '#718096' },
+  'odt': { icon: '📝', name: 'Open Document', color: '#2d3748' },
+  
+  // Spreadsheets
+  'xls': { icon: '📊', name: 'Excel', color: '#217346' },
+  'xlsx': { icon: '📊', name: 'Excel', color: '#217346' },
+  'ods': { icon: '📊', name: 'Open Calc', color: '#2d3748' },
+  'csv': { icon: '📊', name: 'CSV', color: '#718096' },
+  
+  // Presentations
+  'ppt': { icon: '📽️', name: 'PowerPoint', color: '#d24726' },
+  'pptx': { icon: '📽️', name: 'PowerPoint', color: '#d24726' },
+  'odp': { icon: '📽️', name: 'Open Impress', color: '#2d3748' },
+  
+  // Archives
+  'zip': { icon: '🗜️', name: 'ZIP Archive', color: '#805ad5' },
+  'rar': { icon: '🗜️', name: 'RAR Archive', color: '#805ad5' },
+  '7z': { icon: '🗜️', name: '7-Zip', color: '#805ad5' },
+  
+  // Images (optional)
+  'jpg': { icon: '🖼️', name: 'JPEG Image', color: '#4299e1' },
+  'jpeg': { icon: '🖼️', name: 'JPEG Image', color: '#4299e1' },
+  'png': { icon: '🖼️', name: 'PNG Image', color: '#4299e1' },
+  'gif': { icon: '🖼️', name: 'GIF Image', color: '#4299e1' },
+  
+  // Default
+  'default': { icon: '📁', name: 'Document', color: '#718096' }
+};
+
+/* --- ALLOWED FILE TYPES --- */
+const ALLOWED_EXTENSIONS = [
+  // Documents
+  '.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt',
+  // Spreadsheets
+  '.xls', '.xlsx', '.ods', '.csv',
+  // Presentations
+  '.ppt', '.pptx', '.odp',
+  // Archives
+  '.zip', '.rar', '.7z',
+  // Images
+  '.jpg', '.jpeg', '.png', '.gif'
+];
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 /* --- DOM REFS --- */
 const tokenState = document.getElementById('tokenState');
@@ -553,13 +640,15 @@ const editBadge = document.getElementById('editBadge');
 
 // Upload elements
 const uploadArea = document.getElementById('uploadArea');
-const pdfInput = document.getElementById('pdfInput');
+const fileInput = document.getElementById('fileInput');
 const filesPreview = document.getElementById('filesPreview');
 const autoInfo = document.getElementById('autoInfo');
+const manualTitleSection = document.getElementById('manualTitleSection');
+const manualTitleInput = document.getElementById('manualTitle');
 
 /* --- STATE --- */
-let editingId = null; // id being edited
-let selectedFiles = []; // Array of {file, title, year, size, pages}
+let editingId = null;
+let selectedFiles = [];
 let pagesEnabled = false;
 let lastDeploymentTime = null;
 
@@ -588,7 +677,6 @@ function tokenOk(stateText){
   tokenState.textContent = stateText || (t ? (useSession()? "Token (session)":"Token set") : "No token");
   tokenState.style.background = t ? "#dcfce7" : "#1a365d0f";
   
-  // Show/hide publish section based on token
   if (t) {
     publishSection.style.display = 'block';
     checkGitHubPagesStatus();
@@ -608,13 +696,6 @@ function currentCfg(){
   };
 }
 
-function slugify(s){ 
-  return String(s||"").toLowerCase()
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-+|-+$/g,"")
-    .slice(0,50) || "document"; 
-}
-
 function toBase64Utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
 function fromBase64Utf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))); }
 
@@ -628,35 +709,59 @@ function ghHeaders(){
   return h;
 }
 
-/* --- PDF FILENAME PARSING --- */
-function extractDocumentInfoFromFilename(filename) {
-  // Common patterns in Uganda legal document names
-  const patterns = [
-    /^(.+?)_(Act|ACT|act)_(Cap|CAP|cap)_(\d+)/i,
-    /^(.+?)_(Code|CODE|code)_(Act|ACT|act)_(Cap|CAP|cap)_(\d+)/i,
-    /^(.+?)_(Act|ACT|act)_(Cap|CAP|cap)_(\d+)/i,
-    /^(.+?)_(Act|ACT|act)_(\d{4})/i,
-    /^(.+?)_(Act|ACT|act)_(\d{4})_.+/i,
-    /^(.+?)_(Act|ACT|act)/i
-  ];
+/* --- FILE TYPE FUNCTIONS --- */
+function getFileExtension(filename) {
+  return filename.toLowerCase().slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+}
 
-  // Remove .pdf extension
-  const nameWithoutExt = filename.replace(/\.pdf$/i, '');
+function getFileTypeInfo(filename) {
+  const ext = getFileExtension(filename);
+  return fileTypeInfo[ext] || fileTypeInfo.default;
+}
+
+function isFileTypeAllowed(filename) {
+  const ext = getFileExtension(filename).toLowerCase();
+  return ALLOWED_EXTENSIONS.includes('.' + ext) || ALLOWED_EXTENSIONS.includes(filename.toLowerCase());
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/* --- FILENAME PARSING FOR ALL FILE TYPES --- */
+function extractDocumentInfoFromFilename(filename) {
+  // Remove extension
+  const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
   
   let title = nameWithoutExt;
   let year = new Date().getFullYear();
   let actNumber = null;
+
+  // Common legal document patterns
+  const patterns = [
+    /^(.+?)_(Act|ACT|act)_(Cap|CAP|cap)_(\d+)/i,
+    /^(.+?)_(Code|CODE|code)_(Act|ACT|act)_(Cap|CAP|cap)_(\d+)/i,
+    /^(.+?)_(Act|ACT|act)_(\d{4})/i,
+    /^(.+?)_(Act|ACT|act)/i,
+    /^(.+?)_(\d{4})/i,
+    /^(.+?)_(Regulation|REGULATION|regulation)/i,
+    /^(.+?)_(Rule|RULE|rule)/i
+  ];
 
   // Try to match patterns
   for (const pattern of patterns) {
     const match = nameWithoutExt.match(pattern);
     if (match) {
       // Extract title parts
-      const parts = nameWithoutExt.split('_');
+      const parts = nameWithoutExt.split(/[_\s]+/);
       
       // Create readable title
       title = parts.map(part => {
-        if (['Act', 'Cap', 'No', 'The'].includes(part) || /^\d+$/.test(part)) {
+        if (['Act', 'Cap', 'No', 'The', 'Of', 'And'].includes(part) || /^\d+$/.test(part)) {
           return part.toUpperCase();
         }
         return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
@@ -680,7 +785,7 @@ function extractDocumentInfoFromFilename(filename) {
 
   // If no pattern matched, create a nice title from filename
   if (title === nameWithoutExt) {
-    title = nameWithoutExt.split('_')
+    title = nameWithoutExt.split(/[_\s]+/)
       .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
       .join(' ');
   }
@@ -705,84 +810,69 @@ function extractDocumentInfoFromFilename(filename) {
     category = 'evidence';
   } else if (lowerTitle.includes('procedure') || lowerTitle.includes('procedural')) {
     category = 'procedure';
+  } else if (lowerTitle.includes('judicature') || lowerTitle.includes('court')) {
+    category = 'judicature';
+  } else if (lowerTitle.includes('magistrate')) {
+    category = 'magistrate';
+  } else if (lowerTitle.includes('administrative') || lowerTitle.includes('administration')) {
+    category = 'administrative';
+  } else if (lowerTitle.includes('employment') || lowerTitle.includes('labour') || lowerTitle.includes('labor')) {
+    category = 'employment';
+  } else if (lowerTitle.includes('international') || lowerTitle.includes('treaty')) {
+    category = 'international';
   }
 
   return {
     title: title,
     year: year,
     category: category,
-    actNumber: actNumber
+    actNumber: actNumber,
+    fileType: getFileExtension(filename)
   };
 }
 
 /* --- FILE UPLOAD HANDLING --- */
-function readFileAsArrayBuffer(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function getPDFPageCount(file) {
-  try {
-    // Load PDF.js dynamically if needed
-    if (typeof pdfjsLib === 'undefined') {
-      return new Promise((resolve) => {
-        // Estimate pages based on file size (rough estimate: 50KB per page)
-        const estimatedPages = Math.max(1, Math.round(file.size / (50 * 1024)));
-        resolve(estimatedPages);
-      });
-    }
-
-    const arrayBuffer = await readFileAsArrayBuffer(file);
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    return pdf.numPages;
-  } catch (error) {
-    console.warn('Could not get PDF page count:', error);
-    // Estimate pages based on file size
-    const estimatedPages = Math.max(1, Math.round(file.size / (50 * 1024)));
-    return estimatedPages;
-  }
-}
-
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
 function updateFilesPreview() {
   filesPreview.innerHTML = '';
   
   if (selectedFiles.length === 0) {
     autoInfo.style.display = 'none';
+    manualTitleSection.style.display = 'none';
     return;
   }
   
   autoInfo.style.display = 'block';
+  manualTitleSection.style.display = 'block';
+  
+  // If multiple files, use the first one's title as suggestion
+  if (selectedFiles.length === 1) {
+    manualTitleInput.value = selectedFiles[0].title;
+  } else {
+    manualTitleInput.value = '';
+  }
   
   selectedFiles.forEach((fileData, index) => {
     const file = fileData.file;
-    const info = extractDocumentInfoFromFilename(file.name);
+    const fileTypeInfo = getFileTypeInfo(file.name);
     
     const card = document.createElement('div');
     card.className = 'file-card';
     card.innerHTML = `
       <div class="file-header">
-        <div class="file-name" title="${file.name}">${file.name}</div>
-        <div class="file-size">${formatFileSize(file.size)}</div>
+        <div>
+          <span class="file-icon">${fileTypeInfo.icon}</span>
+          <div class="file-name" title="${file.name}">${file.name}</div>
+        </div>
+        <div class="file-type" style="background:${fileTypeInfo.color}20;color:${fileTypeInfo.color}">
+          ${fileTypeInfo.name}
+        </div>
       </div>
       <div class="file-info">
-        <div><strong>Title:</strong> ${info.title}</div>
-        <div><strong>Year:</strong> ${info.year}</div>
-        <div><strong>Category:</strong> ${categoryNames[info.category] || info.category}</div>
-        ${info.actNumber ? `<div><strong>Act/Cap:</strong> ${info.actNumber}</div>` : ''}
-        <div><strong>Pages:</strong> Estimating...</div>
+        <div><strong>Title:</strong> ${fileData.title}</div>
+        <div><strong>Year:</strong> ${fileData.year}</div>
+        <div><strong>Category:</strong> ${categoryNames[fileData.category] || fileData.category}</div>
+        <div><strong>Size:</strong> ${formatFileSize(file.size)}</div>
+        ${fileData.actNumber ? `<div><strong>Act/Cap:</strong> ${fileData.actNumber}</div>` : ''}
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-${index}"></div>
@@ -790,32 +880,6 @@ function updateFilesPreview() {
     `;
     
     filesPreview.appendChild(card);
-    
-    // Get page count asynchronously
-    getPDFPageCount(file).then(pages => {
-      fileData.pages = pages;
-      fileData.title = info.title;
-      fileData.year = info.year;
-      fileData.category = info.category;
-      fileData.size = (file.size / (1024 * 1024)).toFixed(2); // MB
-      
-      const pageElement = card.querySelector('.file-info div:nth-child(4)');
-      if (pageElement) {
-        pageElement.innerHTML = `<strong>Pages:</strong> ${pages}`;
-      }
-    }).catch(error => {
-      console.error('Error getting page count:', error);
-      fileData.pages = Math.max(1, Math.round(file.size / (50 * 1024)));
-      fileData.title = info.title;
-      fileData.year = info.year;
-      fileData.category = info.category;
-      fileData.size = (file.size / (1024 * 1024)).toFixed(2);
-      
-      const pageElement = card.querySelector('.file-info div:nth-child(4)');
-      if (pageElement) {
-        pageElement.innerHTML = `<strong>Pages:</strong> ${fileData.pages} (estimated)`;
-      }
-    });
   });
 }
 
@@ -833,31 +897,48 @@ function handleFileSelect(files) {
   // Process up to 4 files
   const fileArray = Array.from(files).slice(0, 4);
   
+  let hasInvalidFiles = false;
+  let invalidFileNames = [];
+  
   fileArray.forEach(file => {
-    if (file.type === 'application/pdf') {
-      if (file.size > 50 * 1024 * 1024) { // 50MB limit
-        alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
-        return;
-      }
-      
-      const info = extractDocumentInfoFromFilename(file.name);
-      selectedFiles.push({
-        file: file,
-        title: info.title,
-        year: info.year,
-        category: selectedCategory,
-        pages: 0,
-        size: (file.size / (1024 * 1024)).toFixed(2)
-      });
-    } else {
-      alert(`"${file.name}" is not a PDF file. Only PDF files are allowed.`);
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+      hasInvalidFiles = true;
+      return;
     }
+    
+    // Check file type
+    if (!isFileTypeAllowed(file.name)) {
+      invalidFileNames.push(file.name);
+      hasInvalidFiles = true;
+      return;
+    }
+    
+    const info = extractDocumentInfoFromFilename(file.name);
+    selectedFiles.push({
+      file: file,
+      title: info.title,
+      year: info.year,
+      category: selectedCategory,
+      fileType: info.fileType,
+      size: formatFileSize(file.size),
+      actNumber: info.actNumber
+    });
   });
+  
+  if (invalidFileNames.length > 0) {
+    alert(`The following files have unsupported formats:\n${invalidFileNames.join('\n')}\n\nAllowed formats: ${ALLOWED_EXTENSIONS.join(', ')}`);
+  }
+  
+  if (hasInvalidFiles && selectedFiles.length === 0) {
+    return;
+  }
   
   updateFilesPreview();
   
   if (selectedFiles.length > 0) {
-    setStatus(`Ready to upload ${selectedFiles.length} PDF file(s)`);
+    setStatus(`Ready to upload ${selectedFiles.length} file(s)`);
   }
 }
 
@@ -872,7 +953,6 @@ async function checkGitHubPagesStatus() {
       const data = await response.json();
       pagesEnabled = data.status === 'built' || data.status === 'building';
       
-      // Update UI
       const dot = pagesIndicator.querySelector('.pages-dot');
       dot.className = pagesEnabled ? 'pages-dot active' : 'pages-dot inactive';
       pagesIndicator.querySelector('span:nth-child(2)').textContent = 
@@ -882,12 +962,10 @@ async function checkGitHubPagesStatus() {
         `GitHub Pages is ${data.status}. Site URL: ${data.html_url || 'https://hunter9201.github.io/advocate/'}` :
         `GitHub Pages is not enabled. Enable it in repository settings.`;
       
-      // Show/hide pages status in header
       pagesStatus.style.display = 'inline-flex';
       const headerDot = pagesStatus.querySelector('.pages-dot');
       headerDot.className = pagesEnabled ? 'pages-dot active' : 'pages-dot inactive';
       
-      // Get deployment status
       await getLastDeployment();
       
       return pagesEnabled;
@@ -934,24 +1012,18 @@ async function getLastDeployment() {
 async function triggerGitHubPagesDeployment(message = "Deploy to GitHub Pages") {
   try {
     const cfg = currentCfg();
-    
-    // First, update a deployment marker file
     const deployMarkerPath = '.github/deploy-trigger.json';
     const deployMarker = {
       last_deployment: new Date().toISOString(),
       trigger: message
     };
     
-    // Check if file exists
     let sha = null;
     try {
       const existing = await ghGetContents(deployMarkerPath, cfg);
       if (existing.sha) sha = existing.sha;
-    } catch {
-      // File doesn't exist, that's ok
-    }
+    } catch {}
     
-    // Create or update the marker file
     await ghPutContents(
       deployMarkerPath,
       toBase64Utf8(JSON.stringify(deployMarker, null, 2)),
@@ -1055,14 +1127,7 @@ async function ghPutContents(path, base64Content, message, sha=null, cfg=current
   return await r.json();
 }
 
-async function ghDeleteContents(path, message, sha, cfg=currentCfg()){
-  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
-  const r = await fetch(url, { method: "DELETE", headers: {...ghHeaders(), "Content-Type":"application/json"}, body: JSON.stringify({ message, sha, branch: cfg.branch }) });
-  if (!r.ok) throw new Error(`DELETE ${path} failed: ${r.status} ${await r.text()}`);
-  return await r.json();
-}
-
-async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
+async function uploadFileToGitHub(file, filename, message, cfg=currentCfg()) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async () => {
@@ -1116,6 +1181,8 @@ function renderDocumentsAdmin(arr){
   docList.replaceChildren();
   
   arr.forEach(doc=>{
+    const fileTypeInfo = getFileTypeInfo(doc.filename);
+    
     const item = document.createElement('div'); 
     item.className='item'; 
     item.dataset.id=doc.id;
@@ -1138,7 +1205,12 @@ function renderDocumentsAdmin(arr){
     
     const meta = document.createElement('div'); 
     meta.className='muted small'; 
-    meta.textContent = `Category: ${categoryNames[doc.category]||doc.category} • Year: ${doc.year} • Size: ${doc.size}MB • Pages: ${doc.pages}`;
+    meta.innerHTML = `
+      <span>${fileTypeInfo.icon} ${fileTypeInfo.name}</span> • 
+      <span>Category: ${categoryNames[doc.category]||doc.category}</span> • 
+      <span>Year: ${doc.year}</span> • 
+      <span>Size: ${doc.size}</span>
+    `;
     
     const desc = document.createElement('div'); 
     desc.className='muted small'; 
@@ -1171,10 +1243,10 @@ function renderDocumentsAdmin(arr){
     const filenameDiv = document.createElement('div'); 
     filenameDiv.className='muted small'; 
     filenameDiv.style.marginTop='4px';
-    filenameDiv.textContent = `Filename: ${doc.filename}`;
-    if (doc.url) {
-      filenameDiv.innerHTML += ` • <a href="${doc.url}" target="_blank">View on GitHub Pages</a>`;
-    }
+    filenameDiv.innerHTML = `
+      <span>File: ${doc.filename}</span>
+      ${doc.url ? ` • <a href="${doc.url}" target="_blank">View Document</a>` : ''}
+    `;
     item.appendChild(filenameDiv);
     
     docList.appendChild(item);
@@ -1189,13 +1261,12 @@ function startEdit(doc){
   publishBtn.style.display='none'; 
   updateBtn.style.display='inline-block';
   
-  // Clear file selection when editing
   selectedFiles = [];
   updateFilesPreview();
   uploadArea.style.display = 'none';
   autoInfo.style.display = 'none';
+  manualTitleSection.style.display = 'none';
   
-  // Create edit form
   const editForm = document.createElement('div');
   editForm.innerHTML = `
     <div style="margin-top:16px; background:#f0f9ff; padding:12px; border-radius:8px;">
@@ -1235,14 +1306,13 @@ function resetForm(){
   publishBtn.style.display='inline-block'; 
   updateBtn.style.display='none';
   
-  // Reset category to constitutional
   const constitutionalRadio = document.querySelector('input[name="category"][value="constitutional"]');
   if (constitutionalRadio) constitutionalRadio.checked = true;
   
-  // Clear files
   selectedFiles = [];
   updateFilesPreview();
   uploadArea.style.display = 'block';
+  manualTitleInput.value = '';
   
   setStatus('');
 }
@@ -1294,7 +1364,6 @@ updateBtn.addEventListener('click', async ()=>{
     log("✓ documents.json updated on GitHub");
     setStatus('Updated.');
     
-    // Auto-publish to GitHub Pages if enabled
     if (getAutoPublish() && pagesEnabled) {
       setStatus("Triggering GitHub Pages deployment…");
       const deploymentMessage = `Update document: ${updated.title}`;
@@ -1303,15 +1372,14 @@ updateBtn.addEventListener('click', async ()=>{
       setStatus('Updated and deployment triggered.');
     }
     
-    // Show preview
     previewEl.innerHTML = '';
     const it = document.createElement('div'); 
     it.className='item';
     it.innerHTML = `
       <div><strong>${updated.title}</strong> — ${categoryNames[updated.category]||updated.category}</div>
       <div class="muted small">${updated.description||''}</div>
-      <div class="muted small">Filename: ${updated.filename} • Size: ${updated.size}MB • Pages: ${updated.pages}</div>
-      ${updated.url ? `<div class="muted small"><a href="${updated.url}" target="_blank">View on GitHub Pages</a></div>` : ''}
+      <div class="muted small">Filename: ${updated.filename} • Size: ${updated.size} • Type: ${getFileTypeInfo(updated.filename).name}</div>
+      ${updated.url ? `<div class="muted small"><a href="${updated.url}" target="_blank">View Document</a></div>` : ''}
     `;
     previewEl.appendChild(it);
 
@@ -1329,7 +1397,7 @@ updateBtn.addEventListener('click', async ()=>{
 async function deleteDocument(docId){
   try{
     if (!getToken()){ alert("Set your GitHub token first."); return; }
-    if (!confirm(`Delete document ID "${docId}"? This cannot be undone.\n\nNote: This only removes the entry from documents.json. The PDF file must be deleted manually from the repository.`)) return;
+    if (!confirm(`Delete document ID "${docId}"? This cannot be undone.\n\nNote: This only removes the entry from documents.json. The file must be deleted manually from the repository.`)) return;
     if (!(await verifyTokenAccess())){ alert("Token not authorized for this repo."); return; }
 
     setStatus("Deleting…"); 
@@ -1399,7 +1467,6 @@ importInput.addEventListener('change', async (e)=>{
     const data = JSON.parse(text);
     if(!Array.isArray(data)) throw new Error('JSON must be an array');
     
-    // Validate document structure
     const requiredFields = ['id', 'title', 'filename', 'category'];
     data.forEach((doc, idx) => {
       requiredFields.forEach(field => {
@@ -1427,19 +1494,21 @@ importInput.addEventListener('change', async (e)=>{
   }
 });
 
-/* --- ENHANCED PUBLISH FUNCTION --- */
+/* --- ENHANCED PUBLISH FUNCTION FOR ALL FILE TYPES --- */
 publishBtn.addEventListener('click', async ()=>{
   try{
     if (!getToken()){ alert("Set your GitHub token first."); return; }
-    if (selectedFiles.length === 0){ alert("Please select PDF files to upload."); return; }
+    if (selectedFiles.length === 0){ alert("Please select files to upload."); return; }
 
-    // verify token once
     const ok = await verifyTokenAccess(); 
     if (!ok){ alert("Token not authorized for this repo."); return; }
 
     const cfg = currentCfg();
     setStatus("Starting upload process…"); 
     log("=== Starting document upload ===");
+    
+    // Get manual title if provided
+    const manualTitle = manualTitleInput.value.trim();
     
     // Get selected category
     const categoryRadios = document.querySelectorAll('input[name="category"]');
@@ -1478,14 +1547,14 @@ publishBtn.addEventListener('click', async ()=>{
       }
       
       setStatus(`Uploading ${file.name} (${i+1}/${selectedFiles.length})…`);
-      log(`Uploading PDF: ${file.name}`);
+      log(`Uploading: ${file.name} (${fileData.fileType.toUpperCase()})`);
       
       try {
-        // Upload PDF file to GitHub
-        await uploadPDFFile(
+        // Upload file to GitHub
+        await uploadFileToGitHub(
           file,
           file.name,
-          `Add PDF: ${fileData.title}`,
+          `Add ${fileData.fileType.toUpperCase()}: ${fileData.title}`,
           cfg
         );
         
@@ -1493,15 +1562,18 @@ publishBtn.addEventListener('click', async ()=>{
           progressBar.style.width = '60%';
         }
         
+        // Use manual title if provided (for single file), otherwise use auto-extracted title
+        const finalTitle = manualTitle && selectedFiles.length === 1 ? manualTitle : fileData.title;
+        
         // Create document entry
         const document = { 
           id: nextId++,
-          title: fileData.title,
-          description: `Legal document: ${fileData.title}. Uploaded on ${new Date().toLocaleDateString()}.`,
+          title: finalTitle,
+          description: `Legal document: ${finalTitle}. Uploaded on ${new Date().toLocaleDateString()}.`,
           filename: file.name,
           category: selectedCategory,
           size: fileData.size,
-          pages: fileData.pages,
+          fileType: fileData.fileType,
           date: new Date().toISOString().split('T')[0],
           updated: false,
           year: fileData.year,
@@ -1514,7 +1586,7 @@ publishBtn.addEventListener('click', async ()=>{
           progressBar.style.width = '90%';
         }
         
-        log(`✓ Uploaded: ${file.name}`);
+        log(`✓ Uploaded: ${file.name} (${fileData.fileType.toUpperCase()})`);
       } catch (error) {
         log(`✗ Failed to upload ${file.name}: ${error.message}`);
         alert(`Failed to upload ${file.name}. Please try again.`);
@@ -1554,13 +1626,19 @@ publishBtn.addEventListener('click', async ()=>{
     // Show preview
     previewEl.innerHTML = '';
     newDocuments.forEach(doc => {
+      const fileTypeInfo = getFileTypeInfo(doc.filename);
       const it = document.createElement('div'); 
       it.className='item';
       it.innerHTML = `
         <div><strong>${doc.title}</strong> — ${categoryNames[doc.category]||doc.category}</div>
         <div class="muted small">${doc.description||''}</div>
-        <div class="muted small">Filename: ${doc.filename} • Size: ${doc.size}MB • Pages: ${doc.pages}</div>
-        <div class="muted small"><a href="${doc.url}" target="_blank">View on GitHub Pages</a></div>
+        <div class="muted small">
+          ${fileTypeInfo.icon} ${fileTypeInfo.name} • 
+          Filename: ${doc.filename} • 
+          Size: ${doc.size} • 
+          Year: ${doc.year}
+        </div>
+        <div class="muted small"><a href="${doc.url}" target="_blank">View Document</a></div>
       `;
       previewEl.appendChild(it);
     });
@@ -1572,17 +1650,13 @@ publishBtn.addEventListener('click', async ()=>{
       
       const deploymentMessage = `Deploy ${newDocuments.length} new document(s): ${newDocuments.map(d => d.title).join(', ')}`;
       
-      // First, ensure deployment workflow exists
       await createGitHubPagesWorkflow();
-      
-      // Then trigger deployment
       const deployed = await triggerGitHubPagesDeployment(deploymentMessage);
       
       if (deployed) {
         log("✓ GitHub Pages deployment triggered successfully");
         setStatus(`Upload complete! Documents will be available at https://hunter9201.github.io/advocate/ shortly.`);
         
-        // Show success message
         const successMsg = document.createElement('div');
         successMsg.className = 'item';
         successMsg.style.background = '#f0fdf4';
@@ -1614,7 +1688,7 @@ publishBtn.addEventListener('click', async ()=>{
   }
 });
 
-/* --- EVENT LISTENERS FOR NEW FEATURES --- */
+/* --- EVENT LISTENERS --- */
 autoPublishCheckbox.addEventListener('change', (e) => {
   setAutoPublish(e.target.checked);
   log(`Auto-publish ${e.target.checked ? 'enabled' : 'disabled'}`);
@@ -1629,24 +1703,19 @@ publishPagesBtn.addEventListener('click', async () => {
     
     setStatus("Triggering GitHub Pages deployment…");
     
-    // Check if GitHub Pages is enabled
     const pagesEnabled = await checkGitHubPagesStatus();
     if (!pagesEnabled) {
       alert("GitHub Pages is not enabled for this repository. Enable it in the repository settings first.");
       return;
     }
     
-    // Ensure workflow exists
     await createGitHubPagesWorkflow();
-    
-    // Trigger deployment
     const success = await triggerGitHubPagesDeployment("Manual deployment triggered from admin panel");
     
     if (success) {
       setStatus("GitHub Pages deployment triggered successfully!");
       alert("GitHub Pages deployment triggered successfully! Your site will be updated shortly at https://hunter9201.github.io/advocate/");
       
-      // Update last deployment time
       await getLastDeployment();
     } else {
       setStatus("Failed to trigger deployment.");
@@ -1666,11 +1735,9 @@ checkPagesBtn.addEventListener('click', async () => {
 });
 
 /* File upload event listeners */
-uploadArea.addEventListener('click', () => {
-  pdfInput.click();
-});
+uploadArea.addEventListener('click', () => fileInput.click());
 
-pdfInput.addEventListener('change', (e) => {
+fileInput.addEventListener('change', (e) => {
   if (e.target.files.length > 4) {
     alert('Maximum 4 files allowed. Only the first 4 will be processed.');
   }
@@ -1779,7 +1846,6 @@ document.addEventListener('keydown', (e) => {
   cfgBranch.value = cfg.branch;
   cfgDocuments.value = cfg.documentsPath;
   
-  // Check if token exists and show publish section
   if (getToken()) {
     publishSection.style.display = 'block';
     loadAutoPublishSetting();
@@ -1803,6 +1869,7 @@ if (getToken()) {
 
 /* Initial message */
 log("Uganda Legal Documents Admin Panel initialized");
+log("Supports: " + ALLOWED_EXTENSIONS.join(', '));
 log("Set your GitHub token to start managing documents.");
 log("Documents will be automatically published to: https://hunter9201.github.io/advocate/");
 </script>
