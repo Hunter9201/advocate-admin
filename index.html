@@ -366,6 +366,55 @@
     color: #64748b;
   }
   
+  /* NAME DOCUMENTS SECTION */
+  .name-documents-section {
+    margin-top: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  
+  .name-documents-section h3 {
+    margin: 0 0 12px 0;
+    color: var(--brand);
+  }
+  
+  .document-name-item {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  
+  .document-name-item label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  
+  .document-name-item input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .document-name-item input:focus {
+    border-color: var(--brand);
+    outline: none;
+  }
+  
+  .original-filename {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  
   @media (max-width:900px){ 
     .grid{grid-template-columns:1fr}
     .files-preview{grid-template-columns:1fr}
@@ -477,6 +526,17 @@
 
         <!-- Files Preview -->
         <div id="filesPreview" class="files-preview"></div>
+
+        <!-- NAME DOCUMENTS SECTION -->
+        <div id="nameDocumentsSection" class="name-documents-section" style="display:none">
+          <h3>Name Your Documents</h3>
+          <div id="documentNamesContainer">
+            <!-- Document name inputs will be inserted here -->
+          </div>
+          <div class="muted small" style="margin-top:8px">
+            Enter a name for each document. This name will appear in the document list.
+          </div>
+        </div>
 
         <!-- Auto-extracted info -->
         <div id="autoInfo" style="margin-top:16px; display:none;">
@@ -637,9 +697,14 @@ const pdfInput = document.getElementById('pdfInput');
 const filesPreview = document.getElementById('filesPreview');
 const autoInfo = document.getElementById('autoInfo');
 
+// Name documents section
+const nameDocumentsSection = document.getElementById('nameDocumentsSection');
+const documentNamesContainer = document.getElementById('documentNamesContainer');
+
 /* --- STATE --- */
 let editingId = null; // id being edited
 let selectedFiles = []; // Array of {file, title, year, size, pages, chapterNumber, actNumber, category, description}
+let customDocumentNames = {}; // Map of file index to custom name
 let pagesEnabled = false;
 let lastDeploymentTime = null;
 
@@ -988,75 +1053,6 @@ function extractKeywordsFromTitle(title) {
   ).slice(0, 5);
 }
 
-/* --- ENHANCED PDF CONTENT EXTRACTION --- */
-function readFileAsArrayBuffer(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function extractPDFMetadata(file) {
-  try {
-    const arrayBuffer = await readFileAsArrayBuffer(file);
-    
-    // Try to extract text from first page for better metadata
-    if (typeof pdfjsLib !== 'undefined') {
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      
-      // Get first page for metadata extraction
-      const page = await pdf.getPage(1);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map(item => item.str).join(' ');
-      
-      // Look for common legal document patterns in text
-      const yearMatch = pageText.match(/(?:19|20)\d{2}/);
-      const chapterMatch = pageText.match(/Cap\.?\s*(\d+)/i) || 
-                          pageText.match(/Chapter\s+(\d+)/i);
-      const actMatch = pageText.match(/Act\s+No\.?\s*(\d+)/i);
-      const longTitleMatch = pageText.match(/An Act to ([^.]+\.)/i);
-      
-      return {
-        extractedYear: yearMatch ? parseInt(yearMatch[0]) : null,
-        extractedChapter: chapterMatch ? chapterMatch[1] : null,
-        extractedActNumber: actMatch ? actMatch[1] : null,
-        purpose: longTitleMatch ? longTitleMatch[1] : null,
-        firstPageText: pageText.substring(0, 500) // First 500 chars
-      };
-    }
-  } catch (error) {
-    console.warn('Could not extract PDF metadata:', error);
-  }
-  
-  return null;
-}
-
-async function getPDFPageCount(file) {
-  try {
-    // Load PDF.js dynamically if needed
-    if (typeof pdfjsLib === 'undefined') {
-      return new Promise((resolve) => {
-        // Estimate pages based on file size (rough estimate: 50KB per page)
-        const estimatedPages = Math.max(1, Math.round(file.size / (50 * 1024)));
-        resolve(estimatedPages);
-      });
-    }
-
-    const arrayBuffer = await readFileAsArrayBuffer(file);
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    return pdf.numPages;
-  } catch (error) {
-    console.warn('Could not get PDF page count:', error);
-    // Estimate pages based on file size
-    const estimatedPages = Math.max(1, Math.round(file.size / (50 * 1024)));
-    return estimatedPages;
-  }
-}
-
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -1065,153 +1061,42 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-async function processFileUploadWithEnhancedMetadata(file, index) {
-  const info = extractDocumentInfoFromFilename(file.name);
-  
-  // Try to extract additional metadata from PDF
-  const pdfMetadata = await extractPDFMetadata(file);
-  
-  if (pdfMetadata) {
-    // Enhance info with extracted metadata
-    if (pdfMetadata.extractedYear && !info.year) {
-      info.year = pdfMetadata.extractedYear;
-    }
-    if (pdfMetadata.extractedChapter && !info.chapterNumber) {
-      info.chapterNumber = pdfMetadata.extractedChapter;
-    }
-    if (pdfMetadata.extractedActNumber && !info.actNumber) {
-      info.actNumber = pdfMetadata.extractedActNumber;
-    }
-    if (pdfMetadata.purpose) {
-      info.description = `${info.title}. ${pdfMetadata.purpose}`;
-    }
-  }
-  
-  // Get page count
-  const pages = await getPDFPageCount(file);
-  
-  return {
-    file: file,
-    title: info.title,
-    year: info.year,
-    category: info.category,
-    chapterNumber: info.chapterNumber,
-    actNumber: info.actNumber,
-    description: info.description,
-    pages: pages,
-    size: (file.size / (1024 * 1024)).toFixed(2),
-    keywords: info.keywords || [],
-    pdfMetadata: pdfMetadata
-  };
-}
-
-function updateFilesPreview() {
-  filesPreview.innerHTML = '';
-  
-  if (selectedFiles.length === 0) {
-    autoInfo.style.display = 'none';
-    return;
-  }
-  
-  autoInfo.style.display = 'block';
-  
-  // Add upload stats
-  const totalSize = selectedFiles.reduce((sum, f) => sum + f.file.size, 0);
-  const statsDiv = document.createElement('div');
-  statsDiv.className = 'upload-stats';
-  statsDiv.innerHTML = `
-    <div class="stat-item">
-      <div class="stat-number">${selectedFiles.length}</div>
-      <div class="stat-label">Documents</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-number">${formatFileSize(totalSize)}</div>
-      <div class="stat-label">Total Size</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-number">${selectedFiles.reduce((sum, f) => sum + (f.pages || 0), 0)}</div>
-      <div class="stat-label">Total Pages</div>
-    </div>
-  `;
-  filesPreview.appendChild(statsDiv);
+function createDocumentNameInputs() {
+  documentNamesContainer.innerHTML = '';
   
   selectedFiles.forEach((fileData, index) => {
-    const file = fileData.file;
+    const div = document.createElement('div');
+    div.className = 'document-name-item';
     
-    const card = document.createElement('div');
-    card.className = 'file-card legal';
+    const fileName = fileData.file.name;
+    const originalName = fileName.replace('.pdf', '');
+    const customName = customDocumentNames[index] || originalName;
     
-    // Create enhanced preview
-    card.innerHTML = `
-      <div class="file-header">
-        <div class="file-name" title="${file.name}">${fileData.title || file.name}</div>
-        <div class="file-size">${formatFileSize(file.size)}</div>
-      </div>
-      <div class="file-info">
-        <div><strong>Legal Document:</strong> ${fileData.title || 'Processing...'}</div>
-        ${fileData.year ? `<div><strong>Year:</strong> ${fileData.year}</div>` : ''}
-        ${fileData.chapterNumber ? `<div><strong>Chapter:</strong> ${fileData.chapterNumber}</div>` : ''}
-        ${fileData.actNumber ? `<div><strong>Act No.:</strong> ${fileData.actNumber}</div>` : ''}
-        <div><strong>Category:</strong> ${categoryNames[fileData.category] || fileData.category || 'Processing...'}</div>
-        <div><strong>Pages:</strong> <span id="pages-${index}">Estimating...</span></div>
-        ${fileData.description ? `<div style="margin-top:4px; font-style:italic;">${fileData.description.substring(0, 100)}...</div>` : ''}
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-${index}"></div>
-      </div>
+    div.innerHTML = `
+      <label for="docName${index}">Document ${index + 1}</label>
+      <input type="text" 
+             id="docName${index}" 
+             value="${customName}"
+             placeholder="Enter document name"
+             data-index="${index}">
+      <div class="original-filename">Original file: ${fileName}</div>
     `;
     
-    filesPreview.appendChild(card);
-    
-    // Process file for enhanced metadata
-    processFileUploadWithEnhancedMetadata(file, index).then(enhancedData => {
-      selectedFiles[index] = enhancedData;
-      
-      // Update the preview card
-      const pagesElement = card.querySelector(`#pages-${index}`);
-      if (pagesElement) {
-        pagesElement.textContent = enhancedData.pages;
-      }
-      
-      // Update title if extracted
-      const titleElement = card.querySelector('.file-name');
-      if (titleElement && enhancedData.title) {
-        titleElement.textContent = enhancedData.title;
-        titleElement.title = enhancedData.title;
-      }
-      
-      // Update category
-      const categoryElement = card.querySelector('.file-info div:nth-child(4)');
-      if (categoryElement) {
-        categoryElement.innerHTML = `<strong>Category:</strong> ${categoryNames[enhancedData.category] || enhancedData.category}`;
-      }
-      
-      // Add description if available
-      if (enhancedData.description && !card.querySelector('.file-info div:nth-child(6)')) {
-        const descDiv = document.createElement('div');
-        descDiv.style.marginTop = '4px';
-        descDiv.style.fontStyle = 'italic';
-        descDiv.textContent = enhancedData.description.substring(0, 100) + '...';
-        card.querySelector('.file-info').appendChild(descDiv);
-      }
-      
-    }).catch(error => {
-      console.error('Error processing file:', error);
-      selectedFiles[index].pages = Math.max(1, Math.round(file.size / (50 * 1024)));
-      selectedFiles[index].title = fileData.title || file.name.replace('.pdf', '');
-      selectedFiles[index].category = fileData.category || 'other';
-      
-      const pagesElement = card.querySelector(`#pages-${index}`);
-      if (pagesElement) {
-        pagesElement.textContent = `${selectedFiles[index].pages} (estimated)`;
-      }
+    const input = div.querySelector('input');
+    input.addEventListener('input', (e) => {
+      customDocumentNames[index] = e.target.value.trim();
     });
+    
+    documentNamesContainer.appendChild(div);
   });
+  
+  nameDocumentsSection.style.display = 'block';
 }
 
 function handleFileSelect(files) {
   // Clear existing files
   selectedFiles = [];
+  customDocumentNames = {};
   
   // Get selected category
   const categoryRadios = document.querySelectorAll('input[name="category"]');
@@ -1230,18 +1115,20 @@ function handleFileSelect(files) {
         return;
       }
       
+      // Extract basic info from filename
+      const info = extractDocumentInfoFromFilename(file.name);
+      
       // Create initial file data structure
       selectedFiles.push({
         file: file,
-        title: '', // Will be populated by extractDocumentInfoFromFilename
-        year: null,
+        title: info.title,
+        year: info.year,
         category: selectedCategory,
-        chapterNumber: null,
-        actNumber: null,
-        pages: 0,
+        chapterNumber: info.chapterNumber,
+        actNumber: info.actNumber,
         size: (file.size / (1024 * 1024)).toFixed(2),
-        description: '',
-        keywords: []
+        description: info.description,
+        keywords: info.keywords
       });
     } else {
       alert(`"${file.name}" is not a PDF file. Only PDF files are allowed.`);
@@ -1249,26 +1136,87 @@ function handleFileSelect(files) {
   });
   
   updateFilesPreview();
+  createDocumentNameInputs();
   
   if (selectedFiles.length > 0) {
     setStatus(`Ready to upload ${selectedFiles.length} legal document(s)`);
   }
 }
 
+function updateFilesPreview() {
+  filesPreview.innerHTML = '';
+  
+  if (selectedFiles.length === 0) {
+    autoInfo.style.display = 'none';
+    nameDocumentsSection.style.display = 'none';
+    return;
+  }
+  
+  autoInfo.style.display = 'block';
+  
+  // Add upload stats
+  const totalSize = selectedFiles.reduce((sum, f) => sum + f.file.size, 0);
+  const statsDiv = document.createElement('div');
+  statsDiv.className = 'upload-stats';
+  statsDiv.innerHTML = `
+    <div class="stat-item">
+      <div class="stat-number">${selectedFiles.length}</div>
+      <div class="stat-label">Documents</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">${formatFileSize(totalSize)}</div>
+      <div class="stat-label">Total Size</div>
+    </div>
+  `;
+  filesPreview.appendChild(statsDiv);
+  
+  selectedFiles.forEach((fileData, index) => {
+    const file = fileData.file;
+    
+    const card = document.createElement('div');
+    card.className = 'file-card legal';
+    
+    // Use custom name if available, otherwise use extracted title
+    const displayName = customDocumentNames[index] || fileData.title || file.name.replace('.pdf', '');
+    
+    card.innerHTML = `
+      <div class="file-header">
+        <div class="file-name" title="${file.name}">${displayName}</div>
+        <div class="file-size">${formatFileSize(file.size)}</div>
+      </div>
+      <div class="file-info">
+        <div><strong>File:</strong> ${file.name}</div>
+        ${fileData.year ? `<div><strong>Year:</strong> ${fileData.year}</div>` : ''}
+        ${fileData.chapterNumber ? `<div><strong>Chapter:</strong> ${fileData.chapterNumber}</div>` : ''}
+        <div><strong>Category:</strong> ${categoryNames[fileData.category] || fileData.category}</div>
+        ${fileData.description ? `<div style="margin-top:4px; font-style:italic;">${fileData.description.substring(0, 100)}...</div>` : ''}
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-${index}"></div>
+      </div>
+    `;
+    
+    filesPreview.appendChild(card);
+  });
+}
+
 /* --- ENHANCED DOCUMENT ENTRY CREATION --- */
-function createEnhancedDocumentEntry(fileData, filename) {
+function createEnhancedDocumentEntry(fileData, filename, customName, index) {
   const now = new Date();
+  
+  // Use custom name if provided, otherwise use extracted title
+  const documentTitle = customName || fileData.title || fileData.file.name.replace('.pdf', '');
   
   // Generate comprehensive document entry
   const document = { 
     id: 0, // Will be set later
-    title: fileData.title,
+    title: documentTitle,
     description: fileData.description || 
-                `Uganda ${fileData.title}${fileData.chapterNumber ? ` (Chapter ${fileData.chapterNumber})` : ''}${fileData.year ? ` of ${fileData.year}` : ''}.`,
+                `Uganda ${documentTitle}${fileData.chapterNumber ? ` (Chapter ${fileData.chapterNumber})` : ''}${fileData.year ? ` of ${fileData.year}` : ''}.`,
     filename: filename,
     category: fileData.category,
     size: fileData.size,
-    pages: fileData.pages,
+    pages: 0, // Could be enhanced later
     date: now.toISOString().split('T')[0],
     updated: false,
     year: fileData.year,
@@ -1280,7 +1228,6 @@ function createEnhancedDocumentEntry(fileData, filename) {
       uploaded: now.toISOString(),
       fileType: 'pdf',
       verified: false,
-      hasMetadata: !!fileData.pdfMetadata,
       source: 'Admin Panel Upload'
     },
     // Legal document specific fields
@@ -1292,12 +1239,6 @@ function createEnhancedDocumentEntry(fileData, filename) {
       commencement: fileData.year ? `${fileData.year}-01-01` : null
     }
   };
-  
-  // Add extracted metadata if available
-  if (fileData.pdfMetadata) {
-    document.extractedText = fileData.pdfMetadata.firstPageText;
-    document.extractedPurpose = fileData.pdfMetadata.purpose;
-  }
   
   return document;
 }
@@ -1561,7 +1502,7 @@ function renderDocumentsAdmin(arr){
     
     const meta = document.createElement('div'); 
     meta.className='muted small'; 
-    meta.textContent = `Category: ${categoryNames[doc.category]||doc.category} • Year: ${doc.year} • Size: ${doc.size}MB • Pages: ${doc.pages}`;
+    meta.textContent = `Category: ${categoryNames[doc.category]||doc.category} • Year: ${doc.year} • Size: ${doc.size}MB`;
     if (doc.chapter) meta.textContent += ` • Chapter: ${doc.chapter}`;
     if (doc.actNumber) meta.textContent += ` • Act No.: ${doc.actNumber}`;
     
@@ -1619,6 +1560,7 @@ function startEdit(doc){
   updateFilesPreview();
   uploadArea.style.display = 'none';
   autoInfo.style.display = 'none';
+  nameDocumentsSection.style.display = 'none';
   
   // Create edit form
   const editForm = document.createElement('div');
@@ -1670,8 +1612,11 @@ function resetForm(){
   
   // Clear files
   selectedFiles = [];
+  customDocumentNames = {};
   updateFilesPreview();
   uploadArea.style.display = 'block';
+  nameDocumentsSection.style.display = 'none';
+  documentNamesContainer.innerHTML = '';
   
   setStatus('');
 }
@@ -1748,7 +1693,7 @@ updateBtn.addEventListener('click', async ()=>{
         ${updated.actNumber ? `Act No.: ${updated.actNumber} • ` : ''}
       </div>
       <div class="muted small">${updated.description||''}</div>
-      <div class="muted small">Filename: ${updated.filename} • Size: ${updated.size}MB • Pages: ${updated.pages}</div>
+      <div class="muted small">Filename: ${updated.filename} • Size: ${updated.size}MB</div>
       ${updated.url ? `<div class="muted small"><a href="${updated.url}" target="_blank">View on GitHub Pages</a></div>` : ''}
     `;
     previewEl.appendChild(it);
@@ -1923,10 +1868,11 @@ publishBtn.addEventListener('click', async ()=>{
     
     const newDocuments = [];
     
-    // Process each file with enhanced metadata
+    // Process each file with custom names
     for (let i = 0; i < selectedFiles.length; i++) {
       const fileData = selectedFiles[i];
       const file = fileData.file;
+      const customName = customDocumentNames[i] || fileData.title;
       
       // Update progress
       const progressBar = document.getElementById(`progress-${i}`);
@@ -1936,34 +1882,27 @@ publishBtn.addEventListener('click', async ()=>{
       log(`Processing legal document: ${file.name}`);
       
       try {
-        // Enhanced metadata extraction
-        const enhancedData = await processFileUploadWithEnhancedMetadata(file, i);
-        if (progressBar) progressBar.style.width = '40%';
-        
-        setStatus(`Uploading ${enhancedData.title}…`);
-        
-        // Upload PDF file to GitHub with proper error handling
+        // Upload PDF file to GitHub
         await uploadPDFFile(
           file,
           file.name,
-          `Add legal document: ${enhancedData.title}${enhancedData.chapterNumber ? ` (Chapter ${enhancedData.chapterNumber})` : ''}`,
+          `Add legal document: ${customName}${fileData.chapterNumber ? ` (Chapter ${fileData.chapterNumber})` : ''}`,
           cfg
         );
         
         if (progressBar) progressBar.style.width = '70%';
         
-        // Create enhanced document entry
-        const document = createEnhancedDocumentEntry(enhancedData, file.name);
+        // Create enhanced document entry with custom name
+        const document = createEnhancedDocumentEntry(fileData, file.name, customName, i);
         document.id = nextId++;
         newDocuments.push(document);
         
         if (progressBar) progressBar.style.width = '90%';
         
-        log(`✓ Uploaded legal document: ${enhancedData.title}`);
-        log(`  - Category: ${categoryNames[enhancedData.category]||enhancedData.category}`);
-        log(`  - Year: ${enhancedData.year}`);
-        if (enhancedData.chapterNumber) log(`  - Chapter: ${enhancedData.chapterNumber}`);
-        if (enhancedData.actNumber) log(`  - Act No.: ${enhancedData.actNumber}`);
+        log(`✓ Uploaded legal document: ${customName}`);
+        log(`  - Category: ${categoryNames[selectedCategory]||selectedCategory}`);
+        log(`  - Year: ${fileData.year}`);
+        if (fileData.chapterNumber) log(`  - Chapter: ${fileData.chapterNumber}`);
         
       } catch (error) {
         log(`✗ Failed to process ${file.name}: ${error.message}`);
@@ -2034,7 +1973,6 @@ publishBtn.addEventListener('click', async ()=>{
               ${doc.actNumber ? ` • Act No.: ${doc.actNumber}` : ''}
             </div>
           </div>
-          <span class="tag">${doc.pages} pages</span>
         </div>
         <div class="muted small" style="margin-top:4px;">${doc.description||''}</div>
         <div class="muted small" style="margin-top:4px;">
