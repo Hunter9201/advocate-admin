@@ -123,35 +123,7 @@
     color: #0369a1;
   }
   
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-top: 8px;
-  }
-  
-  .category-option {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .category-option input {
-    width: auto;
-  }
-  
-  .stat-badge {
-    display: inline-block;
-    background: #1a365d;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-left: 6px;
-  }
-  
-  /* PDF upload styles */
+  /* Simplified upload area */
   .upload-area {
     border: 2px dashed var(--line);
     border-radius: 10px;
@@ -192,29 +164,14 @@
     background: #fff;
   }
   
-  .file-card.legal {
-    border-left: 4px solid #1a365d;
-  }
-  
-  .file-card.legal .file-header {
-    background: #f8fafc;
-    padding: 8px;
-    border-radius: 6px 6px 0 0;
-  }
-  
-  .file-card.legal .file-name {
-    color: #1a365d;
-    font-weight: 700;
-  }
-  
-  .file-header {
+  .file-card .file-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 8px;
   }
   
-  .file-name {
+  .file-card .file-name {
     font-weight: 600;
     font-size: 14px;
     overflow: hidden;
@@ -224,7 +181,7 @@
     margin-right: 8px;
   }
   
-  .file-size {
+  .file-card .file-size {
     font-size: 12px;
     color: var(--muted);
   }
@@ -301,47 +258,6 @@
     width: auto;
   }
   
-  /* Legal document info styles */
-  .legal-doc-info {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-    margin: 12px 0;
-  }
-  
-  .legal-doc-info h4 {
-    margin: 0 0 8px 0;
-    color: #1a365d;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .legal-meta {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 8px;
-    margin-top: 8px;
-  }
-  
-  .legal-meta-item {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .legal-meta-label {
-    font-size: 11px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .legal-meta-value {
-    font-weight: 600;
-    color: #0f172a;
-  }
-  
   .upload-stats {
     display: flex;
     gap: 16px;
@@ -366,7 +282,7 @@
     color: #64748b;
   }
   
-  /* NAME DOCUMENTS SECTION */
+  /* NAME DOCUMENTS SECTION - simplified */
   .name-documents-section {
     margin-top: 16px;
     background: #f8fafc;
@@ -418,11 +334,9 @@
   @media (max-width:900px){ 
     .grid{grid-template-columns:1fr}
     .files-preview{grid-template-columns:1fr}
-    .legal-meta{grid-template-columns:1fr}
   }
   @media (max-width:768px){ 
     .row{grid-template-columns:1fr}
-    .categories-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -495,26 +409,6 @@
     <div class="card">
       <div class="body">
         <h2 id="formTitle" style="margin:0 0 10px">Upload Legal Documents <span id="editBadge" class="tag" style="display:none">Editing</span></h2>
-        
-        <div style="margin-bottom:12px">
-          <label>Category</label>
-          <div class="categories-grid">
-            <div class="category-option"><input type="radio" name="category" value="constitutional" checked> Constitutional Law</div>
-            <div class="category-option"><input type="radio" name="category" value="criminal"> Criminal Law</div>
-            <div class="category-option"><input type="radio" name="category" value="civil"> Civil Law</div>
-            <div class="category-option"><input type="radio" name="category" value="commercial"> Commercial Law</div>
-            <div class="category-option"><input type="radio" name="category" value="family"> Family Law</div>
-            <div class="category-option"><input type="radio" name="category" value="property"> Property Law</div>
-            <div class="category-option"><input type="radio" name="category" value="evidence"> Evidence Law</div>
-            <div class="category-option"><input type="radio" name="category" value="procedure"> Procedure</div>
-            <div class="category-option"><input type="radio" name="category" value="judicature"> Judicature</div>
-            <div class="category-option"><input type="radio" name="category" value="magistrate"> Magistrate Courts</div>
-            <div class="category-option"><input type="radio" name="category" value="administrative"> Administrative Law</div>
-            <div class="category-option"><input type="radio" name="category" value="employment"> Employment Law</div>
-            <div class="category-option"><input type="radio" name="category" value="international"> International Law</div>
-            <div class="category-option"><input type="radio" name="category" value="other"> Other Acts</div>
-          </div>
-        </div>
 
         <!-- PDF Upload Area -->
         <div class="upload-area" id="uploadArea">
@@ -535,14 +429,6 @@
           </div>
           <div class="muted small" style="margin-top:8px">
             Enter a name for each document. This name will appear in the document list.
-          </div>
-        </div>
-
-        <!-- Auto-extracted info -->
-        <div id="autoInfo" style="margin-top:16px; display:none;">
-          <h4 style="margin:0 0 8px">Auto-extracted Legal Document Information</h4>
-          <div class="muted small">
-            Document titles, years, and legal metadata will be automatically extracted from filenames.
           </div>
         </div>
 
@@ -613,7 +499,7 @@
 <script>
 /* ===========================
    Uganda Legal Documents Admin Panel
-   Enhanced with GitHub Pages Publishing
+   Simplified – removed all metadata fields (year, category, pages, etc.)
    =========================== */
 
 /* --- STORAGE KEYS --- */
@@ -628,24 +514,6 @@ const defaultCfg = {
   repo: "advocate",
   branch: "main",
   documentsPath: "documents.json"
-};
-
-/* --- CATEGORY MAPPING --- */
-const categoryNames = {
-    constitutional: "Constitutional Law",
-    criminal: "Criminal Law",
-    civil: "Civil Law",
-    commercial: "Commercial Law",
-    family: "Family Law",
-    property: "Property Law",
-    evidence: "Evidence Law",
-    procedure: "Procedure",
-    judicature: "Judicature",
-    magistrate: "Magistrate Courts",
-    administrative: "Administrative Law",
-    employment: "Employment Law",
-    international: "International Law",
-    other: "Other Acts"
 };
 
 /* --- DOM REFS --- */
@@ -695,7 +563,6 @@ const editBadge = document.getElementById('editBadge');
 const uploadArea = document.getElementById('uploadArea');
 const pdfInput = document.getElementById('pdfInput');
 const filesPreview = document.getElementById('filesPreview');
-const autoInfo = document.getElementById('autoInfo');
 
 // Name documents section
 const nameDocumentsSection = document.getElementById('nameDocumentsSection');
@@ -703,7 +570,7 @@ const documentNamesContainer = document.getElementById('documentNamesContainer')
 
 /* --- STATE --- */
 let editingId = null; // id being edited
-let selectedFiles = []; // Array of {file, title, year, size, pages, chapterNumber, actNumber, category, description}
+let selectedFiles = []; // Array of {file, customName}
 let customDocumentNames = {}; // Map of file index to custom name
 let pagesEnabled = false;
 let lastDeploymentTime = null;
@@ -753,13 +620,6 @@ function currentCfg(){
   };
 }
 
-function slugify(s){ 
-  return String(s||"").toLowerCase()
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-+|-+$/g,"")
-    .slice(0,50) || "document"; 
-}
-
 function toBase64Utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
 function fromBase64Utf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))); }
 
@@ -773,7 +633,7 @@ function ghHeaders(){
   return h;
 }
 
-/* --- FIXED GITHUB API FUNCTIONS --- */
+/* --- GITHUB API FUNCTIONS --- */
 async function ghGetContents(path, cfg=currentCfg()){
   const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(cfg.branch)}`;
   const r = await fetch(url, {headers: ghHeaders()});
@@ -803,21 +663,6 @@ async function ghPutContents(path, base64Content, message, sha=null, cfg=current
   return await r.json();
 }
 
-async function ghDeleteContents(path, message, sha, cfg=currentCfg()){
-  const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`;
-  const r = await fetch(url, { 
-    method: "DELETE", 
-    headers: {...ghHeaders(), "Content-Type":"application/json"}, 
-    body: JSON.stringify({ message, sha, branch: cfg.branch }) 
-  });
-  if (!r.ok) {
-    const errorText = await r.text();
-    console.error(`DELETE ${path} failed: ${r.status}`, errorText);
-    throw new Error(`DELETE ${path} failed: ${r.status} ${errorText}`);
-  }
-  return await r.json();
-}
-
 async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
   return new Promise(async (resolve, reject) => {
     const reader = new FileReader();
@@ -825,18 +670,11 @@ async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
       try {
         const base64 = btoa(new Uint8Array(reader.result).reduce((data, byte) => data + String.fromCharCode(byte), ''));
         
-        // First, check if file already exists to get its SHA
         let existingSha = null;
         try {
           const existing = await ghGetContents(filename, cfg);
-          if (existing && existing.sha) {
-            existingSha = existing.sha;
-            log(`File ${filename} exists with SHA: ${existingSha.substring(0, 8)}...`);
-          }
-        } catch (error) {
-          // File doesn't exist, that's fine
-          console.log(`File ${filename} doesn't exist, will create new`);
-        }
+          if (existing && existing.sha) existingSha = existing.sha;
+        } catch (error) { /* file doesn't exist */ }
         
         const result = await ghPutContents(filename, base64, message, existingSha, cfg);
         resolve(result);
@@ -849,208 +687,19 @@ async function uploadPDFFile(file, filename, message, cfg=currentCfg()) {
   });
 }
 
-/* --- ENHANCED PDF FILENAME PARSING FOR LEGAL DOCUMENTS --- */
-function extractDocumentInfoFromFilename(filename) {
-  // Remove .pdf extension and clean up
-  const nameWithoutExt = filename.replace(/\.pdf$/i, '')
-    .replace(/_/g, ' ')
-    .replace(/\[/g, ' ')
-    .replace(/\]/g, ' ')
-    .trim();
+/* --- SIMPLIFIED DOCUMENT ENTRY --- */
+function createSimpleDocumentEntry(file, customName, index) {
+  const now = new Date();
+  const title = customName || file.name.replace(/\.pdf$/i, '');
   
-  // Common Uganda legal document patterns
-  const patterns = [
-    // Pattern: "Advocates Act Cap 295" or "Advocates Act [Cap. 295]"
-    /^(.+?)\s+(?:Act|ACT|act)\s+(?:Cap|CAP|cap\.?|Chapter|CHAPTER|CHAP\.?)\s*\.?\s*(\d+)/i,
-    
-    // Pattern: "The Advocates Act Chapter 295"
-    /^The\s+(.+?)\s+(?:Act|ACT|act)\s+(?:Chapter|CHAPTER|CHAP\.?)\s+(\d+)/i,
-    
-    // Pattern: "Advocates Act, Cap. 295"
-    /^(.+?)\s+(?:Act|ACT|act)[,\s]+(?:Cap|CAP|cap\.?)\s*\.?\s*(\d+)/i,
-    
-    // Pattern: "Act 22 of 1970" or "Act No. 22 of 1970"
-    /^(.+?)\s+(?:Act|ACT|act)\s+(?:No\.?\s*)?(\d+)\s+of\s+(\d{4})/i,
-    
-    // Pattern: "The Advocates Act, 1970"
-    /^The\s+(.+?)\s+(?:Act|ACT|act)[,\s]+(\d{4})/i,
-    
-    // Pattern: "CHAPTER 295 THE ADVOCATES ACT"
-    /^CHAPTER\s+(\d+)\s+THE\s+(.+?)\s+(?:Act|ACT|act)/i,
-    
-    // Pattern: "Cap. 295 Advocates Act"
-    /^(?:Cap|CAP|cap\.?)\s*\.?\s*(\d+)\s+(.+?)\s+(?:Act|ACT|act)/i,
-    
-    // Generic pattern for any act with year
-    /^(.+?)\s+(?:Act|ACT|act)\s+(\d{4})/i
-  ];
-
-  let title = nameWithoutExt;
-  let year = new Date().getFullYear();
-  let chapterNumber = null;
-  let actNumber = null;
-  let matchedPattern = null;
-
-  // Try to match patterns
-  for (const pattern of patterns) {
-    const match = nameWithoutExt.match(pattern);
-    if (match) {
-      matchedPattern = pattern;
-      
-      // Extract information based on pattern groups
-      if (pattern.toString().includes('CHAPTER')) {
-        // Pattern: "CHAPTER 295 THE ADVOCATES ACT"
-        chapterNumber = match[1];
-        title = `The ${match[2].trim()} Act`;
-      } else if (pattern.toString().includes('Cap.*\\d+.*Act')) {
-        // Pattern: "Cap. 295 Advocates Act"
-        chapterNumber = match[1];
-        title = `${match[2].trim()} Act`;
-      } else if (match[3] && match[2] && match[1]) {
-        // Pattern with act number and year: "Act 22 of 1970"
-        actNumber = match[2];
-        year = parseInt(match[3]);
-        title = `${match[1].trim()} Act`;
-      } else if (match[2] && match[1]) {
-        // Most common pattern: "Advocates Act Cap 295"
-        if (/^\d+$/.test(match[2])) {
-          // Second group is a number (chapter number)
-          chapterNumber = match[2];
-          title = `${match[1].trim()} Act`;
-        } else if (/^\d{4}$/.test(match[2])) {
-          // Second group is a year
-          year = parseInt(match[2]);
-          title = `${match[1].trim()} Act`;
-        }
-      }
-      
-      break;
-    }
-  }
-
-  // If no pattern matched, try to extract year from any 4-digit number
-  if (!matchedPattern) {
-    const yearMatch = nameWithoutExt.match(/(\d{4})/);
-    if (yearMatch) {
-      year = parseInt(yearMatch[1]);
-    }
-    
-    // Extract chapter/act number if present
-    const numberMatch = nameWithoutExt.match(/(?:Cap|CAP|cap\.?|Chapter|CHAPTER|CHAP\.?|Act|ACT|act\s+No\.?\s*)\s*\.?\s*(\d+)/i);
-    if (numberMatch) {
-      chapterNumber = numberMatch[1];
-    }
-    
-    // Format title nicely
-    title = nameWithoutExt.split(/\s+(?:Act|ACT|act|Cap|CAP|cap|Chapter|CHAPTER)/i)[0];
-    title = title.trim();
-    if (title && !title.toLowerCase().endsWith(' act')) {
-      title += ' Act';
-    }
-  }
-
-  // Capitalize properly: "Advocates Act" not "ADVOCATES ACT"
-  title = title.split(' ')
-    .map(word => {
-      if (['of', 'the', 'and', 'or', 'in', 'on', 'at', 'by'].includes(word.toLowerCase())) {
-        return word.toLowerCase();
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    })
-    .join(' ');
-
-  // Ensure "Act" is capitalized
-  title = title.replace(/\bAct\b/i, 'Act');
-
-  // Extract category from document content analysis
-  let category = extractCategoryFromTitle(title);
-  
-  // Generate description
-  const description = generateLegalDocumentDescription(title, year, chapterNumber, actNumber);
-
-  return {
+  return { 
+    id: 0, // will be set later
     title: title,
-    year: year,
-    category: category,
-    chapterNumber: chapterNumber,
-    actNumber: actNumber,
-    description: description,
-    keywords: extractKeywordsFromTitle(title)
+    filename: file.name,
+    size: (file.size / (1024 * 1024)).toFixed(2),
+    date: now.toISOString().split('T')[0],
+    updated: false
   };
-}
-
-function extractCategoryFromTitle(title) {
-  const titleLower = title.toLowerCase();
-  
-  // Legal document category mapping
-  const categoryMap = [
-    { keywords: ['advocate', 'lawyer', 'legal practice', 'law council', 'disciplinary'], category: 'judicature' },
-    { keywords: ['constitution', 'constitutional'], category: 'constitutional' },
-    { keywords: ['penal', 'criminal', 'offence', 'crime'], category: 'criminal' },
-    { keywords: ['civil', 'procedure', 'tort', 'contract'], category: 'civil' },
-    { keywords: ['evidence'], category: 'evidence' },
-    { keywords: ['company', 'commercial', 'business', 'trade'], category: 'commercial' },
-    { keywords: ['family', 'marriage', 'divorce', 'children'], category: 'family' },
-    { keywords: ['land', 'property', 'registration', 'conveyancing'], category: 'property' },
-    { keywords: ['employment', 'labour', 'work'], category: 'employment' },
-    { keywords: ['magistrate', 'court', 'judicature'], category: 'magistrate' },
-    { keywords: ['administrative', 'government', 'public'], category: 'administrative' },
-    { keywords: ['international', 'treaty', 'diplomatic'], category: 'international' }
-  ];
-
-  for (const mapping of categoryMap) {
-    for (const keyword of mapping.keywords) {
-      if (titleLower.includes(keyword)) {
-        return mapping.category;
-      }
-    }
-  }
-  
-  return 'other';
-}
-
-function generateLegalDocumentDescription(title, year, chapterNumber, actNumber) {
-  let desc = `${title}`;
-  
-  if (chapterNumber) {
-    desc += ` (Chapter ${chapterNumber})`;
-  }
-  
-  if (actNumber) {
-    desc += `, Act No. ${actNumber}`;
-  }
-  
-  desc += ` of ${year}. `;
-  
-  // Add generic description based on category
-  const category = extractCategoryFromTitle(title);
-  const categoryDescriptions = {
-    'constitutional': 'This constitutional law document outlines fundamental principles and rights.',
-    'criminal': 'This criminal law legislation defines offences and penalties under Ugandan law.',
-    'civil': 'This civil law statute governs private rights and remedies.',
-    'commercial': 'This commercial law act regulates business and trade activities.',
-    'family': 'This family law legislation governs marriage, divorce, and family matters.',
-    'property': 'This property law statute regulates land ownership and transactions.',
-    'evidence': 'This evidence law governs admissibility and procedure in legal proceedings.',
-    'procedure': 'This procedural law outlines court processes and legal procedures.',
-    'judicature': 'This judicature legislation regulates courts and legal practitioners.',
-    'magistrate': 'This statute governs magistrate courts and their jurisdiction.',
-    'administrative': 'This administrative law regulates government agencies and procedures.',
-    'international': 'This international law document governs cross-border legal matters.',
-    'other': 'This Ugandan legislation is part of the country\'s legal framework.'
-  };
-  
-  desc += categoryDescriptions[category] || 'This Ugandan legislation is part of the country\'s legal framework.';
-  
-  return desc;
-}
-
-function extractKeywordsFromTitle(title) {
-  const commonWords = ['the', 'act', 'of', 'and', 'or', 'in', 'on', 'at', 'by', 'for', 'to'];
-  const words = title.toLowerCase().split(/\s+/);
-  return words.filter(word => 
-    word.length > 3 && !commonWords.includes(word) && !/\d/.test(word)
-  ).slice(0, 5);
 }
 
 function formatFileSize(bytes) {
@@ -1076,7 +725,7 @@ function createDocumentNameInputs() {
       <label for="docName${index}">Document ${index + 1}</label>
       <input type="text" 
              id="docName${index}" 
-             value="${customName}"
+             value="${customName.replace(/"/g, '&quot;')}"
              placeholder="Enter document name"
              data-index="${index}">
       <div class="original-filename">Original file: ${fileName}</div>
@@ -1094,42 +743,18 @@ function createDocumentNameInputs() {
 }
 
 function handleFileSelect(files) {
-  // Clear existing files
   selectedFiles = [];
   customDocumentNames = {};
   
-  // Get selected category
-  const categoryRadios = document.querySelectorAll('input[name="category"]');
-  let selectedCategory = 'constitutional';
-  categoryRadios.forEach(radio => {
-    if (radio.checked) selectedCategory = radio.value;
-  });
-  
-  // Process up to 4 files
   const fileArray = Array.from(files).slice(0, 4);
   
   fileArray.forEach(file => {
     if (file.type === 'application/pdf') {
-      if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      if (file.size > 50 * 1024 * 1024) {
         alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
         return;
       }
-      
-      // Extract basic info from filename
-      const info = extractDocumentInfoFromFilename(file.name);
-      
-      // Create initial file data structure
-      selectedFiles.push({
-        file: file,
-        title: info.title,
-        year: info.year,
-        category: selectedCategory,
-        chapterNumber: info.chapterNumber,
-        actNumber: info.actNumber,
-        size: (file.size / (1024 * 1024)).toFixed(2),
-        description: info.description,
-        keywords: info.keywords
-      });
+      selectedFiles.push({ file: file });
     } else {
       alert(`"${file.name}" is not a PDF file. Only PDF files are allowed.`);
     }
@@ -1147,14 +772,10 @@ function updateFilesPreview() {
   filesPreview.innerHTML = '';
   
   if (selectedFiles.length === 0) {
-    autoInfo.style.display = 'none';
     nameDocumentsSection.style.display = 'none';
     return;
   }
   
-  autoInfo.style.display = 'block';
-  
-  // Add upload stats
   const totalSize = selectedFiles.reduce((sum, f) => sum + f.file.size, 0);
   const statsDiv = document.createElement('div');
   statsDiv.className = 'upload-stats';
@@ -1172,13 +793,9 @@ function updateFilesPreview() {
   
   selectedFiles.forEach((fileData, index) => {
     const file = fileData.file;
-    
     const card = document.createElement('div');
-    card.className = 'file-card legal';
-    
-    // Use custom name if available, otherwise use extracted title
-    const displayName = customDocumentNames[index] || fileData.title || file.name.replace('.pdf', '');
-    
+    card.className = 'file-card';
+    const displayName = customDocumentNames[index] || file.name.replace('.pdf', '');
     card.innerHTML = `
       <div class="file-header">
         <div class="file-name" title="${file.name}">${displayName}</div>
@@ -1186,64 +803,16 @@ function updateFilesPreview() {
       </div>
       <div class="file-info">
         <div><strong>File:</strong> ${file.name}</div>
-        ${fileData.year ? `<div><strong>Year:</strong> ${fileData.year}</div>` : ''}
-        ${fileData.chapterNumber ? `<div><strong>Chapter:</strong> ${fileData.chapterNumber}</div>` : ''}
-        <div><strong>Category:</strong> ${categoryNames[fileData.category] || fileData.category}</div>
-        ${fileData.description ? `<div style="margin-top:4px; font-style:italic;">${fileData.description.substring(0, 100)}...</div>` : ''}
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-${index}"></div>
       </div>
     `;
-    
     filesPreview.appendChild(card);
   });
 }
 
-/* --- ENHANCED DOCUMENT ENTRY CREATION --- */
-function createEnhancedDocumentEntry(fileData, filename, customName, index) {
-  const now = new Date();
-  
-  // Use custom name if provided, otherwise use extracted title
-  const documentTitle = customName || fileData.title || fileData.file.name.replace('.pdf', '');
-  
-  // Generate comprehensive document entry
-  const document = { 
-    id: 0, // Will be set later
-    title: documentTitle,
-    description: fileData.description || 
-                `Uganda ${documentTitle}${fileData.chapterNumber ? ` (Chapter ${fileData.chapterNumber})` : ''}${fileData.year ? ` of ${fileData.year}` : ''}.`,
-    filename: filename,
-    category: fileData.category,
-    size: fileData.size,
-    pages: 0, // Could be enhanced later
-    date: now.toISOString().split('T')[0],
-    updated: false,
-    year: fileData.year,
-    chapter: fileData.chapterNumber,
-    actNumber: fileData.actNumber,
-    keywords: fileData.keywords,
-    url: `https://hunter9201.github.io/advocate/${encodeURIComponent(filename)}`,
-    metadata: {
-      uploaded: now.toISOString(),
-      fileType: 'pdf',
-      verified: false,
-      source: 'Admin Panel Upload'
-    },
-    // Legal document specific fields
-    legalInfo: {
-      jurisdiction: 'Uganda',
-      documentType: 'Act',
-      status: 'Current',
-      amendments: [],
-      commencement: fileData.year ? `${fileData.year}-01-01` : null
-    }
-  };
-  
-  return document;
-}
-
-/* --- GITHUB PAGES FUNCTIONS --- */
+/* --- GITHUB PAGES FUNCTIONS (unchanged) --- */
 async function checkGitHubPagesStatus() {
   try {
     const cfg = currentCfg();
@@ -1254,7 +823,6 @@ async function checkGitHubPagesStatus() {
       const data = await response.json();
       pagesEnabled = data.status === 'built' || data.status === 'building';
       
-      // Update UI
       const dot = pagesIndicator.querySelector('.pages-dot');
       dot.className = pagesEnabled ? 'pages-dot active' : 'pages-dot inactive';
       pagesIndicator.querySelector('span:nth-child(2)').textContent = 
@@ -1264,14 +832,11 @@ async function checkGitHubPagesStatus() {
         `GitHub Pages is ${data.status}. Site URL: ${data.html_url || 'https://hunter9201.github.io/advocate/'}` :
         `GitHub Pages is not enabled. Enable it in repository settings.`;
       
-      // Show/hide pages status in header
       pagesStatus.style.display = 'inline-flex';
       const headerDot = pagesStatus.querySelector('.pages-dot');
       headerDot.className = pagesEnabled ? 'pages-dot active' : 'pages-dot inactive';
       
-      // Get deployment status
       await getLastDeployment();
-      
       return pagesEnabled;
     } else {
       pagesIndicator.querySelector('.pages-dot').className = 'pages-dot inactive';
@@ -1295,7 +860,6 @@ async function getLastDeployment() {
     const cfg = currentCfg();
     const url = `${API_BASE}/repos/${cfg.owner}/${cfg.repo}/deployments`;
     const response = await fetch(url, { headers: ghHeaders() });
-    
     if (response.ok) {
       const deployments = await response.json();
       if (deployments.length > 0) {
@@ -1316,24 +880,17 @@ async function getLastDeployment() {
 async function triggerGitHubPagesDeployment(message = "Deploy to GitHub Pages") {
   try {
     const cfg = currentCfg();
-    
-    // First, update a deployment marker file
     const deployMarkerPath = '.github/deploy-trigger.json';
     const deployMarker = {
       last_deployment: new Date().toISOString(),
       trigger: message
     };
-    
-    // Check if file exists
     let sha = null;
     try {
       const existing = await ghGetContents(deployMarkerPath, cfg);
       if (existing.sha) sha = existing.sha;
-    } catch {
-      // File doesn't exist, that's ok
-    }
+    } catch { /* file doesn't exist */ }
     
-    // Create or update the marker file
     await ghPutContents(
       deployMarkerPath,
       toBase64Utf8(JSON.stringify(deployMarker, null, 2)),
@@ -1341,7 +898,6 @@ async function triggerGitHubPagesDeployment(message = "Deploy to GitHub Pages") 
       sha || undefined,
       cfg
     );
-    
     log(`✓ Triggered GitHub Pages deployment: ${message}`);
     return true;
   } catch (error) {
@@ -1355,7 +911,6 @@ async function createGitHubPagesWorkflow() {
   try {
     const cfg = currentCfg();
     const workflowPath = '.github/workflows/deploy-to-pages.yml';
-    
     const workflowContent = `name: Deploy to GitHub Pages
 
 on:
@@ -1383,28 +938,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
-      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 `;
-
-    // Check if workflow already exists
     let sha = null;
     try {
       const existing = await ghGetContents(workflowPath, cfg);
       if (existing.sha) sha = existing.sha;
-    } catch {
-      // File doesn't exist, that's ok
-    }
+    } catch { /* file doesn't exist */ }
     
     await ghPutContents(
       workflowPath,
@@ -1413,7 +961,6 @@ jobs:
       sha,
       cfg
     );
-    
     log('✓ Created/updated GitHub Pages deployment workflow');
     return true;
   } catch (error) {
@@ -1447,7 +994,7 @@ async function verifyTokenAccess(){
   }
 }
 
-/* Documents.json */
+/* Documents.json (simplified) */
 async function loadDocumentsJson(){
   try {
     const got = await ghGetContents(currentCfg().documentsPath);
@@ -1502,17 +1049,10 @@ function renderDocumentsAdmin(arr){
     
     const meta = document.createElement('div'); 
     meta.className='muted small'; 
-    meta.textContent = `Category: ${categoryNames[doc.category]||doc.category} • Year: ${doc.year} • Size: ${doc.size}MB`;
-    if (doc.chapter) meta.textContent += ` • Chapter: ${doc.chapter}`;
-    if (doc.actNumber) meta.textContent += ` • Act No.: ${doc.actNumber}`;
-    
-    const desc = document.createElement('div'); 
-    desc.className='muted small'; 
-    desc.textContent = (doc.description||'').slice(0,140);
+    meta.textContent = `Size: ${doc.size}MB • Uploaded: ${doc.date || 'Unknown'}`;
     
     left.appendChild(name); 
-    left.appendChild(meta); 
-    left.appendChild(desc);
+    left.appendChild(meta);
 
     const right = document.createElement('div'); 
     right.className='bar';
@@ -1555,41 +1095,17 @@ function startEdit(doc){
   publishBtn.style.display='none'; 
   updateBtn.style.display='inline-block';
   
-  // Clear file selection when editing
   selectedFiles = [];
   updateFilesPreview();
   uploadArea.style.display = 'none';
-  autoInfo.style.display = 'none';
   nameDocumentsSection.style.display = 'none';
   
-  // Create edit form
   const editForm = document.createElement('div');
   editForm.innerHTML = `
     <div style="margin-top:16px; background:#f0f9ff; padding:12px; border-radius:8px;">
-      <h4>Edit Legal Document Details</h4>
-      <div class="row">
-        <div><label>Document Title</label><input id="editTitle" value="${doc.title || ''}"></div>
-        <div><label>Year</label><input id="editYear" type="number" value="${doc.year || new Date().getFullYear()}"></div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <div><label>Chapter Number</label><input id="editChapter" value="${doc.chapter || ''}" placeholder="e.g., 295"></div>
-        <div><label>Act Number</label><input id="editActNumber" value="${doc.actNumber || ''}" placeholder="e.g., 22"></div>
-      </div>
-      <div style="margin-top:8px">
-        <label>Description</label>
-        <textarea id="editDesc" rows="2">${doc.description || ''}</textarea>
-      </div>
-      <div style="margin-top:8px">
-        <label>Category</label>
-        <div class="categories-grid" id="editCategories">
-          ${Object.entries(categoryNames).map(([value, name]) => `
-            <div class="category-option">
-              <input type="radio" name="editCategory" value="${value}" ${doc.category === value ? 'checked' : ''}>
-              ${name}
-            </div>
-          `).join('')}
-        </div>
-      </div>
+      <h4>Edit Document Details</h4>
+      <div><label>Document Title</label><input id="editTitle" value="${(doc.title || '').replace(/"/g, '&quot;')}"></div>
+      <div style="margin-top:8px"><label>Description (optional)</label><textarea id="editDesc" rows="2">${(doc.description || '').replace(/"/g, '&quot;')}</textarea></div>
     </div>
   `;
   
@@ -1606,11 +1122,6 @@ function resetForm(){
   publishBtn.style.display='inline-block'; 
   updateBtn.style.display='none';
   
-  // Reset category to constitutional
-  const constitutionalRadio = document.querySelector('input[name="category"][value="constitutional"]');
-  if (constitutionalRadio) constitutionalRadio.checked = true;
-  
-  // Clear files
   selectedFiles = [];
   customDocumentNames = {};
   updateFilesPreview();
@@ -1631,13 +1142,7 @@ updateBtn.addEventListener('click', async ()=>{
     if (!(await verifyTokenAccess())){ alert("Token not authorized for this repo."); return; }
     
     const title = document.getElementById('editTitle')?.value?.trim();
-    const year = document.getElementById('editYear')?.value;
-    const chapter = document.getElementById('editChapter')?.value?.trim();
-    const actNumber = document.getElementById('editActNumber')?.value?.trim();
     const description = document.getElementById('editDesc')?.value?.trim();
-    const categoryRadio = document.querySelector('input[name="editCategory"]:checked');
-    const category = categoryRadio ? categoryRadio.value : 'constitutional';
-    
     if (!title){ alert("Enter document title."); return; }
 
     const cfg = currentCfg();
@@ -1651,11 +1156,7 @@ updateBtn.addEventListener('click', async ()=>{
     const updated = { 
       ...arr[idx], 
       title: title,
-      description: description || arr[idx].description,
-      category: category,
-      year: parseInt(year) || arr[idx].year,
-      chapter: chapter || arr[idx].chapter,
-      actNumber: actNumber || arr[idx].actNumber,
+      description: description || '',
       updated: true
     };
     
@@ -1672,28 +1173,20 @@ updateBtn.addEventListener('click', async ()=>{
     log("✓ documents.json updated on GitHub");
     setStatus('Updated.');
     
-    // Auto-publish to GitHub Pages if enabled
     if (getAutoPublish() && pagesEnabled) {
       setStatus("Triggering GitHub Pages deployment…");
-      const deploymentMessage = `Update legal document: ${updated.title}`;
       await createGitHubPagesWorkflow();
-      await triggerGitHubPagesDeployment(deploymentMessage);
+      await triggerGitHubPagesDeployment(`Update legal document: ${updated.title}`);
       setStatus('Updated and deployment triggered.');
     }
     
-    // Show preview
     previewEl.innerHTML = '';
     const it = document.createElement('div'); 
     it.className='item';
     it.innerHTML = `
-      <div><strong>${updated.title}</strong> — ${categoryNames[updated.category]||updated.category}</div>
-      <div class="muted small">
-        ${updated.year ? `Year: ${updated.year} • ` : ''}
-        ${updated.chapter ? `Chapter: ${updated.chapter} • ` : ''}
-        ${updated.actNumber ? `Act No.: ${updated.actNumber} • ` : ''}
-      </div>
-      <div class="muted small">${updated.description||''}</div>
+      <div><strong>${updated.title}</strong></div>
       <div class="muted small">Filename: ${updated.filename} • Size: ${updated.size}MB</div>
+      ${updated.description ? `<div class="muted small">${updated.description}</div>` : ''}
       ${updated.url ? `<div class="muted small"><a href="${updated.url}" target="_blank">View on GitHub Pages</a></div>` : ''}
     `;
     previewEl.appendChild(it);
@@ -1783,17 +1276,6 @@ importInput.addEventListener('change', async (e)=>{
     const text = await file.text();
     const data = JSON.parse(text);
     if(!Array.isArray(data)) throw new Error('JSON must be an array');
-    
-    // Validate document structure
-    const requiredFields = ['id', 'title', 'filename', 'category'];
-    data.forEach((doc, idx) => {
-      requiredFields.forEach(field => {
-        if (!doc.hasOwnProperty(field)) {
-          throw new Error(`Document at index ${idx} missing required field: ${field}`);
-        }
-      });
-    });
-    
     const { sha } = await loadDocumentsJson();
     await ghPutContents(
       currentCfg().documentsPath, 
@@ -1802,7 +1284,6 @@ importInput.addEventListener('change', async (e)=>{
       sha||undefined, 
       currentCfg()
     );
-    
     alert('Imported successfully.');
     await refreshDocumentsList();
     importInput.value = '';
@@ -1812,7 +1293,7 @@ importInput.addEventListener('change', async (e)=>{
   }
 });
 
-/* --- ENHANCED PUBLISH FUNCTION --- */
+/* --- UPLOAD (simplified) --- */
 publishBtn.addEventListener('click', async ()=>{
   try{
     if (!getToken()){ 
@@ -1824,7 +1305,6 @@ publishBtn.addEventListener('click', async ()=>{
       return; 
     }
 
-    // verify token once
     const ok = await verifyTokenAccess(); 
     if (!ok){ 
       alert("Token not authorized for this repo."); 
@@ -1834,13 +1314,6 @@ publishBtn.addEventListener('click', async ()=>{
     const cfg = currentCfg();
     setStatus("Starting legal document upload process…"); 
     log("=== Starting legal document upload ===");
-    
-    // Get selected category
-    const categoryRadios = document.querySelectorAll('input[name="category"]');
-    let selectedCategory = 'constitutional';
-    categoryRadios.forEach(radio => {
-      if (radio.checked) selectedCategory = radio.value;
-    });
 
     setStatus("Loading existing legal documents…");
     let arr = []; 
@@ -1863,18 +1336,15 @@ publishBtn.addEventListener('click', async ()=>{
       arr = [];
     }
 
-    // Generate new IDs
     let nextId = arr.length > 0 ? Math.max(...arr.map(d => d.id || 0)) + 1 : 1;
     
     const newDocuments = [];
     
-    // Process each file with custom names
     for (let i = 0; i < selectedFiles.length; i++) {
       const fileData = selectedFiles[i];
       const file = fileData.file;
-      const customName = customDocumentNames[i] || fileData.title;
+      const customName = customDocumentNames[i] || file.name.replace(/\.pdf$/i, '');
       
-      // Update progress
       const progressBar = document.getElementById(`progress-${i}`);
       if (progressBar) progressBar.style.width = '20%';
       
@@ -1882,27 +1352,22 @@ publishBtn.addEventListener('click', async ()=>{
       log(`Processing legal document: ${file.name}`);
       
       try {
-        // Upload PDF file to GitHub
         await uploadPDFFile(
           file,
           file.name,
-          `Add legal document: ${customName}${fileData.chapterNumber ? ` (Chapter ${fileData.chapterNumber})` : ''}`,
+          `Add legal document: ${customName}`,
           cfg
         );
         
         if (progressBar) progressBar.style.width = '70%';
         
-        // Create enhanced document entry with custom name
-        const document = createEnhancedDocumentEntry(fileData, file.name, customName, i);
+        const document = createSimpleDocumentEntry(file, customName, i);
         document.id = nextId++;
         newDocuments.push(document);
         
         if (progressBar) progressBar.style.width = '90%';
         
         log(`✓ Uploaded legal document: ${customName}`);
-        log(`  - Category: ${categoryNames[selectedCategory]||selectedCategory}`);
-        log(`  - Year: ${fileData.year}`);
-        if (fileData.chapterNumber) log(`  - Chapter: ${fileData.chapterNumber}`);
         
       } catch (error) {
         log(`✗ Failed to process ${file.name}: ${error.message}`);
@@ -1912,12 +1377,10 @@ publishBtn.addEventListener('click', async ()=>{
       }
     }
     
-    // Add all new documents to array
     arr.push(...newDocuments);
     
     setStatus("Updating legal documents database…");
     
-    // Update documents.json with pretty formatting
     await ghPutContents(
       cfg.documentsPath, 
       toBase64Utf8(JSON.stringify(arr, null, 2)), 
@@ -1928,20 +1391,15 @@ publishBtn.addEventListener('click', async ()=>{
     
     log(`✓ Legal documents database updated with ${newDocuments.length} new document(s)`);
     
-    // Complete progress bars
     selectedFiles.forEach((_, i) => {
       const progressBar = document.getElementById(`progress-${i}`);
       if (progressBar) progressBar.style.width = '100%';
     });
     
-    // Create comprehensive summary
-    const summary = newDocuments.map(doc => 
-      `${doc.title}${doc.chapter ? ` (Chapter ${doc.chapter})` : ''}${doc.year ? `, ${doc.year}` : ''}`
-    ).join('\n• ');
+    const summary = newDocuments.map(doc => doc.title).join('\n• ');
     
     setStatus(`Successfully uploaded ${newDocuments.length} legal document(s)!`);
     
-    // Enhanced preview display
     previewEl.innerHTML = '';
     const summaryDiv = document.createElement('div'); 
     summaryDiv.className='item';
@@ -1959,69 +1417,43 @@ publishBtn.addEventListener('click', async ()=>{
     `;
     previewEl.appendChild(summaryDiv);
     
-    // Show individual documents
     newDocuments.forEach(doc => {
       const it = document.createElement('div'); 
       it.className='item';
       it.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div>
-            <strong>${doc.title}</strong>
-            <div class="muted small">
-              ${categoryNames[doc.category]||doc.category} • 
-              ${doc.year ? `Year: ${doc.year}` : ''}${doc.chapter ? ` • Chapter: ${doc.chapter}` : ''}
-              ${doc.actNumber ? ` • Act No.: ${doc.actNumber}` : ''}
-            </div>
-          </div>
-        </div>
-        <div class="muted small" style="margin-top:4px;">${doc.description||''}</div>
-        <div class="muted small" style="margin-top:4px;">
-          <strong>Filename:</strong> ${doc.filename} • 
-          <strong>Size:</strong> ${doc.size}MB
-        </div>
-        <div class="muted small" style="margin-top:4px;">
-          <a href="${doc.url}" target="_blank">📄 View on GitHub Pages</a>
-        </div>
+        <div><strong>${doc.title}</strong></div>
+        <div class="muted small">Filename: ${doc.filename} • Size: ${doc.size}MB</div>
+        <div class="muted small"><a href="https://hunter9201.github.io/advocate/${encodeURIComponent(doc.filename)}" target="_blank">📄 View on GitHub Pages</a></div>
       `;
       previewEl.appendChild(it);
     });
 
-    // Auto-publish to GitHub Pages
     if (getAutoPublish() && pagesEnabled) {
       setStatus("Publishing to GitHub Pages…");
       log("=== Publishing legal documents to GitHub Pages ===");
-      
-      const deploymentMessage = `Publish ${newDocuments.length} legal document(s)`;
-      
       await createGitHubPagesWorkflow();
-      const deployed = await triggerGitHubPagesDeployment(deploymentMessage);
+      await triggerGitHubPagesDeployment(`Publish ${newDocuments.length} legal document(s)`);
       
-      if (deployed) {
-        const successMsg = document.createElement('div');
-        successMsg.className = 'item';
-        successMsg.style.background = '#f0fdf4';
-        successMsg.style.borderColor = '#16a34a';
-        successMsg.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:20px;">🚀</span>
-            <strong>GitHub Pages Deployment Successful</strong>
+      const successMsg = document.createElement('div');
+      successMsg.className = 'item';
+      successMsg.style.background = '#f0fdf4';
+      successMsg.style.borderColor = '#16a34a';
+      successMsg.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🚀</span>
+          <strong>GitHub Pages Deployment Successful</strong>
+        </div>
+        <div style="margin:8px 0;">
+          <div class="muted small">Your legal documents are being published to:</div>
+          <div style="margin:4px 0;">
+            <a href="https://hunter9201.github.io/advocate/" target="_blank" style="color:#1a365d; font-weight:bold;">
+              https://hunter9201.github.io/advocate/
+            </a>
           </div>
-          <div style="margin:8px 0;">
-            <div class="muted small">Your legal documents are being published to:</div>
-            <div style="margin:4px 0;">
-              <a href="https://hunter9201.github.io/advocate/" target="_blank" style="color:#1a365d; font-weight:bold;">
-                https://hunter9201.github.io/advocate/
-              </a>
-            </div>
-          </div>
-          <div class="muted small">
-            Documents will be available in 1-2 minutes. You can view them at the URL above.
-          </div>
-        `;
-        previewEl.prepend(successMsg);
-        
-        setStatus(`Legal documents published! Available at: https://hunter9201.github.io/advocate/`);
-      }
+        </div>
+      `;
+      previewEl.prepend(successMsg);
+      setStatus(`Legal documents published! Available at: https://hunter9201.github.io/advocate/`);
     }
     
     await refreshDocumentsList();
@@ -2035,7 +1467,7 @@ publishBtn.addEventListener('click', async ()=>{
   }
 });
 
-/* --- EVENT LISTENERS FOR NEW FEATURES --- */
+/* --- EVENT LISTENERS --- */
 autoPublishCheckbox.addEventListener('change', (e) => {
   setAutoPublish(e.target.checked);
   log(`Auto-publish ${e.target.checked ? 'enabled' : 'disabled'}`);
@@ -2047,27 +1479,17 @@ publishPagesBtn.addEventListener('click', async () => {
       alert("Set your GitHub token first.");
       return;
     }
-    
     setStatus("Triggering GitHub Pages deployment…");
-    
-    // Check if GitHub Pages is enabled
     const pagesEnabled = await checkGitHubPagesStatus();
     if (!pagesEnabled) {
       alert("GitHub Pages is not enabled for this repository. Enable it in the repository settings first.");
       return;
     }
-    
-    // Ensure workflow exists
     await createGitHubPagesWorkflow();
-    
-    // Trigger deployment
     const success = await triggerGitHubPagesDeployment("Manual deployment triggered from admin panel");
-    
     if (success) {
       setStatus("GitHub Pages deployment triggered successfully!");
       alert("GitHub Pages deployment triggered successfully! Your site will be updated shortly at https://hunter9201.github.io/advocate/");
-      
-      // Update last deployment time
       await getLastDeployment();
     } else {
       setStatus("Failed to trigger deployment.");
@@ -2098,7 +1520,6 @@ pdfInput.addEventListener('change', (e) => {
   handleFileSelect(e.target.files);
 });
 
-// Drag and drop support
 uploadArea.addEventListener('dragover', (e) => {
   e.preventDefault();
   uploadArea.classList.add('dragover');
@@ -2112,7 +1533,6 @@ uploadArea.addEventListener('dragleave', (e) => {
 uploadArea.addEventListener('drop', (e) => {
   e.preventDefault();
   uploadArea.classList.remove('dragover');
-  
   if (e.dataTransfer.files.length > 0) {
     if (e.dataTransfer.files.length > 4) {
       alert('Maximum 4 files allowed. Only the first 4 will be processed.');
@@ -2142,18 +1562,14 @@ async function saveTokenFromModal() {
     alert("Please enter a GitHub token.");
     return;
   }
-  
   setToken(token);
   hideTokenModal();
-  
   setStatus("Testing token…");
   const ok = await verifyTokenAccess();
   setStatus(ok ? "Token OK" : "Token invalid for repo");
 }
 
-/* Token / Session buttons */
 setTokenBtn.addEventListener('click', showTokenModal);
-
 setSessionBtn.addEventListener('click', ()=>{
   if(confirm('Use sessionStorage? Your token will clear when you close the tab.')){
     sessionStorage.setItem(SESSION_ONLY_KEY,'1');
@@ -2165,7 +1581,6 @@ setSessionBtn.addEventListener('click', ()=>{
     tokenOk();
   }
 });
-
 clearTokenBtn.addEventListener('click', ()=>{
   localStorage.removeItem(TOKEN_KEY);
   sessionStorage.removeItem(TOKEN_KEY);
@@ -2173,23 +1588,14 @@ clearTokenBtn.addEventListener('click', ()=>{
   tokenOk("No token");
 });
 
-/* Token modal event listeners */
 closeTokenModal.addEventListener('click', hideTokenModal);
 cancelTokenBtn.addEventListener('click', hideTokenModal);
 saveTokenBtn.addEventListener('click', saveTokenFromModal);
-
-// Close modal when clicking outside of it
 tokenModal.addEventListener('click', (e) => {
-  if (e.target === tokenModal) {
-    hideTokenModal();
-  }
+  if (e.target === tokenModal) hideTokenModal();
 });
-
-// Handle Escape key to close modal
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && tokenModal.style.display === 'flex') {
-    hideTokenModal();
-  }
+  if (e.key === 'Escape' && tokenModal.style.display === 'flex') hideTokenModal();
 });
 
 /* --- INITIALIZATION --- */
@@ -2200,30 +1606,25 @@ document.addEventListener('keydown', (e) => {
   cfgBranch.value = cfg.branch;
   cfgDocuments.value = cfg.documentsPath;
   
-  // Check if token exists and show publish section
   if (getToken()) {
     publishSection.style.display = 'block';
     loadAutoPublishSetting();
   }
 })();
 
-// Initialize event listeners for config changes
 [cfgOwner,cfgRepo,cfgBranch,cfgDocuments].forEach(el=>{
   el.addEventListener('change', ()=> saveCfg(currentCfg()));
 });
 
-/* --- STARTUP --- */
 tokenOk();
 refreshBtn.addEventListener('click', refreshDocumentsList);
 refreshDocumentsList();
 
-// Check GitHub Pages status on startup if token exists
 if (getToken()) {
   setTimeout(() => checkGitHubPagesStatus(), 1000);
 }
 
-/* Initial message */
-log("Uganda Legal Documents Admin Panel initialized");
+log("Uganda Legal Documents Admin Panel initialized (simplified)");
 log("Set your GitHub token to start managing legal documents.");
 log("Legal documents will be automatically published to: https://hunter9201.github.io/advocate/");
 </script>
